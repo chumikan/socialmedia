@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test('register, publish, follow, interact, reply, bookmark, profile, notifications and DM', async ({
+test('register, publish, follow, interact, reply, bookmark, profile, notifications', async ({
   page,
   browser
 }) => {
@@ -95,18 +95,10 @@ test('register, publish, follow, interact, reply, bookmark, profile, notificatio
   await expect(
     page.getByText(`UI Person ${suffix}`, { exact: true }).first()
   ).toBeVisible();
-  await page.goto(`/${other.username}`);
-  await page.getByRole('button', { name: 'Message', exact: true }).click();
-  await expect(page).toHaveURL(/\/messages\//);
-  await page.getByPlaceholder('Send a message').fill(`private ${suffix}`);
-  await page.locator('form button[type=submit]').click();
-  await expect(
-    page.getByText(`private ${suffix}`, { exact: true })
-  ).toBeVisible();
   const otherPage = await second.newPage();
   await otherPage.goto('/notifications');
   await expect(
-    otherPage.getByText('You received a new message', { exact: true }).first()
+    otherPage.getByText('A new user followed you', { exact: true }).first()
   ).toBeVisible();
   expect(errors).toEqual([]);
   await second.close();

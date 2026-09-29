@@ -12,8 +12,6 @@ import { UserDetails } from '@components/user/user-details';
 import { UserNav } from '@components/user/user-nav';
 import { Button } from '@components/ui/button';
 import { Loading } from '@components/ui/loading';
-import { HeroIcon } from '@components/ui/hero-icon';
-import { ToolTip } from '@components/ui/tooltip';
 import { FollowButton } from '@components/ui/follow-button';
 import { variants } from '@components/user/user-header';
 import { UserEditProfile } from '@components/user/user-edit-profile';
@@ -25,7 +23,6 @@ import type { JSX } from 'react';
 export const UserHomeLayout = ({ children }: LayoutProps): JSX.Element => {
   const { user, isAdmin } = useAuth();
   const { user: userData, loading } = useUser();
-  const router = useRouter();
 
   const {
     query: { username }
@@ -54,24 +51,6 @@ export const UserHomeLayout = ({ children }: LayoutProps): JSX.Element => {
       toast.success('Account status updated');
     } catch (error) {
       toast.error((error as Error).message);
-    }
-  };
-
-  const handleSendMessage = async (): Promise<void> => {
-    try {
-      const conversation = await api<{ id: string }>('/conversations', 'POST', {
-        targetUserId: userData?.id
-      });
-      void router.push(`/messages/${conversation.id}`);
-    } catch (err) {
-      toast.error(
-        () => (
-          <span className='flex gap-2'>
-            Something went wrong while sending the message
-          </span>
-        ),
-        { duration: 6000 }
-      );
     }
   };
 
@@ -146,16 +125,6 @@ export const UserHomeLayout = ({ children }: LayoutProps): JSX.Element => {
                 ) : (
                   <div className='flex gap-2 self-start'>
                     <UserShare username={userData.username} />
-                    <Button
-                      aria-label='Message'
-                      onClick={handleSendMessage}
-                      className='dark-bg-tab group relative border border-light-line-reply p-2
-                                 hover:bg-light-primary/10 active:bg-light-primary/20 dark:border-light-secondary
-                                 dark:hover:bg-dark-primary/10 dark:active:bg-dark-primary/20'
-                    >
-                      <HeroIcon className='h-5 w-5' iconName='EnvelopeIcon' />
-                      <ToolTip tip='Message' />
-                    </Button>
                     <FollowButton
                       userTargetId={userData.id}
                       userTargetUsername={userData.username}

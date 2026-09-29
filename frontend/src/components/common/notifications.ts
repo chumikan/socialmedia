@@ -16,11 +16,7 @@ const placeholder = {
     description: '#name liked your Tweet.'
   },
   reply: { title: 'New reply', description: '#name replied to your Tweet.' },
-  repost: { title: 'New repost', description: '#name reposted your Tweet.' },
-  message: {
-    title: 'You received a new message',
-    description: '#name sent you a message.'
-  }
+  repost: { title: 'New repost', description: '#name reposted your Tweet.' }
 };
 
 const ReplaceParams = (
@@ -44,8 +40,7 @@ const ReplaceParams = (
 
 export const NotificationTypes = (notification: NotificationWithUser) => {
   const placeholderProp =
-    placeholder[notification.type as keyof typeof placeholder] ??
-    placeholder.message;
+    placeholder[notification.type as keyof typeof placeholder];
 
   const userInfo = ReplaceParams(placeholderProp, {
     name: notification.user.name ?? notification.user.username

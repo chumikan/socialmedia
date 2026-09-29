@@ -87,8 +87,6 @@ func (a *App) Handler() http.Handler {
 	m.HandleFunc("PUT /api/v1/users/{id}/follow", a.wrap(a.follow(true)))
 	m.HandleFunc("DELETE /api/v1/users/{id}/follow", a.wrap(a.follow(false)))
 	m.HandleFunc("PUT /api/v1/users/{id}/ban", a.wrap(a.ban))
-	m.HandleFunc("POST /api/v1/conversations", a.wrap(a.createConversation))
-	m.HandleFunc("POST /api/v1/messages", a.wrap(a.createMessage))
 	m.HandleFunc("PATCH /api/v1/notifications/{id}", a.wrap(a.readNotification))
 	m.HandleFunc("POST /api/v1/media", a.wrap(a.upload))
 	m.HandleFunc("GET /api/v1/media/{id}", a.wrap(a.media))

@@ -6,7 +6,7 @@ import (
 )
 
 func TestQueryAuthorizationAndInjection(t *testing.T) {
-	for _, collection := range []string{"messages", "conversations", "notifications"} {
+	for _, collection := range []string{"notifications"} {
 		sql, args, err := compileQuery(QueryInput{Collection: collection, Limit: 10}, "alice")
 		if err != nil {
 			t.Fatal(err)
@@ -35,5 +35,13 @@ func TestUsernameAndMediaValidation(t *testing.T) {
 	}
 	if allowedMedia("image/svg+xml") || allowedMedia("text/html") {
 		t.Fatal("active content accepted")
+	}
+}
+
+func TestRemovedCollectionsRejected(t *testing.T) {
+	for _, collection := range []string{"messages", "conversations"} {
+		if _, _, err := compileQuery(QueryInput{Collection: collection}, "alice"); err == nil {
+			t.Fatalf("removed collection accepted: %s", collection)
+		}
 	}
 }

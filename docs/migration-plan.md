@@ -1,13 +1,13 @@
 # Firebase → Go / PostgreSQL migration
 
 ## Inventory (before migration)
-- Next.js Pages Router / React / TypeScript: home, profiles, replies, media, likes, follows, bookmarks, explore, notifications, messages.
+- Next.js Pages Router / React / TypeScript: home, profiles, replies, media, likes, follows, bookmarks, explore, notifications.
 - `src/lib/firebase/{app,collections,utils}.ts`: Auth, Firestore, Storage and Functions SDK initialization, direct writes, counters and uploads.
 - `src/lib/context/auth-context.tsx`: email/password and Google authentication, client-created profiles/stats; administrator inferred from username.
 - `src/lib/hooks/use{Collection,Document,ArrayDocument,InfiniteScroll}` plus page/component imports: snapshots, filters and growing-limit pagination.
-- Collections: users, tweets, users/*/stats, users/*/bookmarks, trends, notifications, conversations, messages. Timestamp objects, embedded media and arrays of follower/like/repost IDs.
+- Collections: users, tweets, users/*/stats, users/*/bookmarks, trends, notifications. Timestamp objects, embedded media and arrays of follower/like/repost IDs.
 - `functions/src/normalize-stats.ts`: cleanup after tweet deletion. `notify-email.ts`: Gmail new-post notification.
-- Firestore rules include a catch-all authenticated read/write grant; DM privacy and administrator authority must be enforced by the API instead. Storage: authenticated media reads, owner uploads, 50 MiB limit. Fixed administrator UID in rules.
+- Firestore rules include a catch-all authenticated read/write grant; private data access and administrator authority must be enforced by the API instead. Storage: authenticated media reads, owner uploads, 50 MiB limit. Fixed administrator UID in rules.
 - Socket.IO API verifies Firebase token; online presence UI currently returns a placeholder. No actual Realtime Database calls found.
 - Jest configured but no test files found; CI test step commented out. CI assumes root npm project despite yarn lockfile.
 - Original Firebase implementation/configuration archived under `docs/legacy/firebase/` for offline reference only. Existing root .env files are excluded from new service builds.
@@ -16,7 +16,7 @@
 1. Preserve existing UI and move Next.js to frontend; add a single Go HTTP service in backend.
 2. PostgreSQL normalized foreign-key tables and transactional writes; pgx driver; bcrypt passwords; SCS server-side PostgreSQL sessions, HttpOnly cookies, same-origin mutation guard.
 3. Connect authentication, posts, follow relationships and chronological feed first.
-4. Connect interactions, profiles, search/trends, notifications, DM, moderation and S3 media. Keep legacy read-view shapes through a typed local query adapter; no Firebase SDK or Firebase transport at runtime.
+4. Connect interactions, profiles, search/trends, notifications, moderation and S3 media. Keep legacy read-view shapes through a typed local query adapter; no Firebase SDK or Firebase transport at runtime.
 5. Offline JSON import, Compose, CI, integration and UI verification. Record any gaps explicitly.
 
 ## Feature mapping
@@ -30,7 +30,6 @@
 | Profile/theme/pin | user-edit-profile, utils | PATCH /api/v1/users/{id} | users | implemented; DB/API tests |
 | Search/trends | explore, aside-trends, input | /api/v1/query | users, posts, post_tags | implemented; DB/API tests |
 | Notifications | aside-notifications | /api/v1/query; PATCH /api/v1/notifications/{id} | notifications | implemented; DB/API tests |
-| DM | message pages, user-home-layout | /api/v1/conversations; /api/v1/messages | conversations, messages | implemented; DB/API tests |
 | BAN | isBanned / UI-only guard | /api/v1/users/{id}/ban | users, moderation_events | implemented; DB/API tests |
 | Media | Firebase Storage upload | /api/v1/media | media + private S3 bucket | implemented; DB/API tests |
 | Deletion cleanup | normalizeStats function | DELETE /api/v1/posts/{id} + FK cascade | related tables | implemented; DB/API tests |
@@ -49,3 +48,8 @@ No production data access. Import only user-provided exports; never reuse Fireba
 - The legacy "online" socket handler only emitted one authenticated user's ID; it has been replaced by authenticated activity polling. This changes presence latency to up to 30 seconds.
 - Local Compose storage is single-node SeaweedFS. Production should use managed/replicated S3-compatible storage, HTTPS, backups and ingress rate limits.
 - Email outbox SMTP delivery is at least once. A crash after sending and before marking delivery may send a duplicate email.
+
+## DM removal migration
+`004_remove_dm.sql` removes `message_documents` and `conversation_documents` before dropping `messages` and `conversations`. PostgreSQL also drops their primary-key indexes and `messages_conversation`, `conversations_pair`, `conversations_user`, and `conversations_target`. Existing notifications with type `message` are deleted.
+
+Applied migrations are tracked by filename. Keep `001_initial.sql` as migration history; both new installations and existing databases reach the same schema through migration 004. Stop old API instances before deploying the new version (API startup applies migrations), and take a database backup first. This migration permanently deletes DM history; rollback requires restoring the backup with the matching old application. No live database is changed by editing these files.

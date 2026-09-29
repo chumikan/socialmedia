@@ -1,6 +1,6 @@
 # OpenTwitter — Next.js + Go + PostgreSQL
 
-既存のNext.js画面を利用するSNSです。認証・投稿・フォロー・時系列フィード・返信・いいね・リポスト・ブックマーク・プロフィール・検索・通知・DM・BANをGo APIで処理し、画像/動画はS3互換ストレージへ保存します。
+既存のNext.js画面を利用するSNSです。認証・投稿・フォロー・時系列フィード・返信・いいね・リポスト・ブックマーク・プロフィール・検索・通知・BANをGo APIで処理し、画像/動画はS3互換ストレージへ保存します。
 
 - `frontend/`: Next.js Pages Router / TypeScript / Tailwind
 - `backend/`: 単一Go API、PostgreSQLマイグレーション、テスト、管理・インポートCLI

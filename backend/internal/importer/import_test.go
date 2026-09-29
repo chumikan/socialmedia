@@ -71,7 +71,7 @@ func TestImportIntegration(t *testing.T) {
 			t.Fatal(e)
 		}
 	}
-	for table, want := range map[string]int{"users": 2, "posts": 1, "follows": 1, "likes": 1, "reposts": 1, "bookmarks": 1, "messages": 1, "post_tags": 1} {
+	for table, want := range map[string]int{"users": 2, "posts": 1, "follows": 1, "likes": 1, "reposts": 1, "bookmarks": 1, "post_tags": 1} {
 		var n int
 		if e = p.QueryRow(ctx, "SELECT count(*) FROM "+table).Scan(&n); e != nil || n != want {
 			t.Fatalf("%s: %d %v", table, n, e)
@@ -85,5 +85,19 @@ func TestImportIntegration(t *testing.T) {
 	v.Users[0]["following"] = json.RawMessage(`["missing-user"]`)
 	if v.Apply(ctx, p) == nil {
 		t.Fatal("dangling FK import accepted")
+	}
+}
+
+func TestUnsupportedNotificationRejected(t *testing.T) {
+	for _, kind := range []string{"message", "unknown"} {
+		v := fixture(t)
+		b, err := json.Marshal(kind)
+		if err != nil {
+			t.Fatal(err)
+		}
+		v.Notifications = []Document{{"id": json.RawMessage(`"obsolete"`), "type": b}}
+		if err := v.Validate(); err == nil {
+			t.Fatalf("accepted notification type %s", kind)
+		}
 	}
 }

@@ -1,14 +1,6 @@
 import Link from 'next/link';
-import {
-  CiHome,
-  CiMail,
-  CiBellOn,
-  CiBookmark,
-  CiUser,
-  CiSearch
-} from 'react-icons/ci';
+import { CiHome, CiBellOn, CiBookmark, CiUser, CiSearch } from 'react-icons/ci';
 import { useState, useEffect } from 'react';
-import { usePathname } from 'next/navigation';
 import { query, where } from '@lib/api/query';
 import { useAuth } from '@lib/context/auth-context';
 import { useWindow } from '@lib/context/window-context';
@@ -45,7 +37,6 @@ export type NewNavLinks = NavLink;
 export function Sidebar(): JSX.Element {
   const { user } = useAuth();
   const { isMobile } = useWindow();
-  const path = usePathname();
 
   const { open, openModal, closeModal } = useModal();
 
@@ -67,14 +58,6 @@ export function Sidebar(): JSX.Element {
       count: 0,
       iconName: 'BellIcon',
       icon: <CiBellOn size={34} />
-    },
-    {
-      href: '/messages',
-      linkName: 'Messages',
-      disabled: false,
-      count: 0,
-      iconName: 'EnvelopeIcon',
-      icon: <CiMail size={34} />
     },
     {
       href: '/bookmarks',
@@ -157,20 +140,18 @@ export function Sidebar(): JSX.Element {
             />
             {!isMobile && <MoreSettings />}
           </nav>
-          {!path.includes('messages/') && (
-            <Button
-              className='accent-tab absolute right-4 -translate-y-[72px] bg-main-accent text-lg font-bold text-white
+          <Button
+            className='accent-tab absolute right-4 -translate-y-[72px] bg-main-accent text-lg font-bold text-white
                        outline-none transition hover:brightness-90 active:brightness-75 xs:static xs:translate-y-0
                        xs:hover:bg-main-accent/90 xs:active:bg-main-accent/75 xl:w-11/12'
-              onClick={openModal}
-            >
-              <CustomIcon
-                className='block h-6 w-6 xl:hidden'
-                iconName='FeatherIcon'
-              />
-              <p className='hidden xl:block'>Tweet</p>
-            </Button>
-          )}
+            onClick={openModal}
+          >
+            <CustomIcon
+              className='block h-6 w-6 xl:hidden'
+              iconName='FeatherIcon'
+            />
+            <p className='hidden xl:block'>Tweet</p>
+          </Button>
         </section>
         {!isMobile && <SidebarProfile />}
       </div>

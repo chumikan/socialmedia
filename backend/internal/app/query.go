@@ -158,12 +158,6 @@ func compileQuery(in QueryInput, uid string) (string, []any, error) {
 			security = "(author_id=$1 OR EXISTS(SELECT 1 FROM follows WHERE follower_id=$1 AND followed_id=author_id) OR EXISTS(SELECT 1 FROM reposts rp JOIN follows f ON f.followed_id=rp.user_id WHERE f.follower_id=$1 AND rp.post_id=post_documents.id))"
 		}
 		base += " WHERE " + security
-	case "conversations":
-		base = "SELECT id,data FROM conversation_documents WHERE (user_id=$1 OR target_user_id=$1)"
-		addFields("userId targetUserId")
-	case "messages":
-		base = "SELECT id,data FROM message_documents WHERE (participant_a=$1 OR participant_b=$1)"
-		addFields("userId conversationId")
 	case "notifications":
 		base = "SELECT id,data FROM notification_documents WHERE target_user_id=$1"
 		addFields("userId targetUserId type isChecked")

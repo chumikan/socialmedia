@@ -164,18 +164,10 @@ func TestIntegration(t *testing.T) {
 	if status, _, _ := call("POST", "/query", q("users/"+alice+"/bookmarks"), bc); status != 403 {
 		t.Fatal("bookmark leak")
 	}
-	cid := must("POST", "/conversations", map[string]string{"targetUserId": bob}, ac)["id"].(string)
-	other := must("POST", "/conversations", map[string]string{"targetUserId": alice}, bc)["id"].(string)
-	if cid != other {
-		t.Fatal("duplicate conversation")
-	}
-	must("POST", "/messages", map[string]string{"conversationId": cid, "text": "private"}, ac)
-	private := must("POST", "/query", q("messages"), ec)
-	if len(private["items"].([]any)) != 0 {
-		t.Fatal("DM privacy failure")
-	}
-	if s, _, _ := call("POST", "/messages", map[string]string{"conversationId": cid, "text": "intrusion"}, ec); s != 404 {
-		t.Fatalf("DM write authorization %d", s)
+	for _, route := range []string{"/messages", "/conversations"} {
+		if status, _, _ := call("POST", route, map[string]string{}, ac); status != http.StatusNotFound {
+			t.Fatalf("removed route %s returned %d", route, status)
+		}
 	}
 	ns := must("POST", "/query", q("notifications"), bc)["items"].([]any)
 	if len(ns) < 2 {

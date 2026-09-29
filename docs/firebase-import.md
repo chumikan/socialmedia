@@ -4,7 +4,7 @@ The importer never calls Firebase, Google Cloud or external image URLs. It reads
 
 ## Input
 
-See `docs/fixtures/firebase-export.json` for a complete small example. Top-level arrays are `users`, `tweets`, `conversations`, `messages`, `notifications`, `authUsers`, `media`; `bookmarks` maps user IDs to bookmark arrays. Each Firestore document must include its document ID as `id`. Preserve original field names and UID references. `createdAt` accepts RFC3339 or `{seconds,nanoseconds}` / `{_seconds,_nanoseconds}`. Embedded `images` reference media manifest IDs.
+See `docs/fixtures/firebase-export.json` for a complete small example. Top-level arrays are `users`, `tweets`, `notifications`, `authUsers`, `media`; `bookmarks` maps user IDs to bookmark arrays. Each Firestore document must include its document ID as `id`. Preserve original field names and UID references. `createdAt` accepts RFC3339 or `{seconds,nanoseconds}` / `{_seconds,_nanoseconds}`. Embedded `images` reference media manifest IDs.
 
 Firebase Auth JSON exports can supply `authUsers` entries with `localId`, `email`, and `providerUserInfo`. Google `rawId` is imported into oauth_identities. Password hashes and administrator privileges are deliberately not imported: Firebase scrypt hashes are not bcrypt hashes. Stats and trends are rebuilt from posts/relationships. `following` is the canonical source for follows; reconcile inconsistent old follower arrays before import.
 
@@ -30,9 +30,9 @@ go run ./cmd/import-firebase -file ../exports/export.json -media-dir ../exports/
 go run ./cmd/import-firebase -file ../exports/export.json -media-dir ../exports/media -apply
 ```
 
-Stable IDs and ON CONFLICT make a repeated import idempotent. Existing rows are retained; this is not a bidirectional sync. Do not mix unrelated exports sharing IDs. DB failure rolls back the database transaction; S3 objects uploaded before that failure can remain and be reused on retry. Missing references fail the transaction rather than being silently dropped. Duplicate conversation pairs with different IDs must be reconciled in the export first. Import does not enqueue historical email notifications.
+Stable IDs and ON CONFLICT make a repeated import idempotent. Existing rows are retained; this is not a bidirectional sync. Do not mix unrelated exports sharing IDs. DB failure rolls back the database transaction; S3 objects uploaded before that failure can remain and be reused on retry. Missing references fail the transaction rather than being silently dropped. Import does not enqueue historical email notifications.
 
-After import, compare counts, sample user profiles, follows, posts/replies, media, bookmarks and private conversations. Run the same export twice in staging to confirm idempotency. Only switch frontend traffic after this validation and a rollback snapshot.
+After import, compare counts, sample user profiles, follows, posts/replies, media, bookmarks and notifications. Run the same export twice in staging to confirm idempotency. Only switch frontend traffic after this validation and a rollback snapshot.
 
 For email/password users, establish identity through your account recovery process, then set a new password through the administrative CLI. Do not use a common default password:
 
@@ -42,3 +42,5 @@ go run ./cmd/user -email user@example.com -password-stdin < /path/to/protected-p
 ```
 
 This changes the bcrypt hash and revokes prior sessions. Google accounts with imported provider IDs can use configured Google OIDC. Users missing exported email addresses receive a non-deliverable `<UID>@import.invalid` address and need operator reconciliation.
+
+Supported notification types are `follower`, `liked`, `reply`, and `repost`. Remove obsolete notification types from legacy exports before importing; unsupported types fail validation. Unknown top-level JSON fields are ignored and are not imported.

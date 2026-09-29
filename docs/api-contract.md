@@ -25,8 +25,6 @@ Errors: `{error:string}` with 400 validation, 401 missing/expired/revoked sessio
 | PUT / DELETE /users/{id}/follow | none | Current user; self-follow and banned targets rejected. |
 | PATCH /users/{id} | Subset of `name,bio,website,location,username,photoURL,coverPhotoURL,theme,accent,pinnedTweet` | Owner or admin. No role/verified/BAN fields. Pin must belong to profile owner. Media must be owned by actor. |
 | PUT /users/{id}/ban | `{banned:boolean,reason:string}` | Admin only, cannot target self or another admin. Audit row; session version increments. |
-| POST /conversations | `{targetUserId}` | Current user; unordered pair unique; returns existing or new `{id}`. |
-| POST /messages | `{conversationId,text}` | Participant only, 1–4000 characters, recipient must not be banned. Updates conversation and notifies recipient atomically. |
 | PATCH /notifications/{id} | `{isChecked:boolean}` | Recipient only. |
 | POST /media | multipart `file` | Authenticated, non-banned; 1 byte–50 MiB; content sniffed JPEG/PNG/GIF/WebP/MP4/WebM/QuickTime. Stores metadata in PostgreSQL, bytes in private S3. Returns MediaDTO. |
 
@@ -40,13 +38,13 @@ Errors: `{error:string}` with 400 validation, 401 missing/expired/revoked sessio
 {"collection":"feed","constraints":[{"kind":"where","field":"parent","op":"==","value":null},{"kind":"order","field":"createdAt","op":"desc"}],"limit":20,"cursor":""}
 ```
 
-Returns `{items: DTO[],nextCursor:string}`. Maximum page size 100, default 50. A nonempty nextCursor is passed verbatim for the next page with the same collection and constraints. Keyset pagination uses ordered values plus a stable ID tie-breaker; insertion at the head does not shift later pages. Ordering by mutable values (e.g. conversation updatedAt) is not a transaction snapshot. The client deduplicates IDs. `{count:true}` returns `{count:number}`.
+Returns `{items: DTO[],nextCursor:string}`. Maximum page size 100, default 50. A nonempty nextCursor is passed verbatim for the next page with the same collection and constraints. Keyset pagination uses ordered values plus a stable ID tie-breaker; insertion at the head does not shift later pages. Ordering by mutable values (e.g. user updatedAt) is not a transaction snapshot. The client deduplicates IDs. `{count:true}` returns `{count:number}`.
 
-Allowed collections: `users`, `tweets`, `feed`, `trends`, `conversations`, `messages`, `notifications`, `users/{id}/bookmarks`, `users/{id}/stats`. Each has a field allowlist in query.go; no SQL, table names or writes are accepted. Filters: `==`, `!=`, comparisons, `array-contains`; order: asc/desc; start/end bounds for username prefix search. `where text search` uses PostgreSQL simple full-text search with a GIN index. Japanese morphological tokenization is not included.
+Allowed collections: `users`, `tweets`, `feed`, `trends`, `notifications`, `users/{id}/bookmarks`, `users/{id}/stats`. Each has a field allowlist in query.go; no SQL, table names or writes are accepted. Filters: `==`, `!=`, comparisons, `array-contains`; order: asc/desc; start/end bounds for username prefix search. `where text search` uses PostgreSQL simple full-text search with a GIN index. Japanese morphological tokenization is not included.
 
 Feed = own/followed users' posts plus posts reposted by followed users, newest original post first; one entry per post. Client can exclude replies. Banned authors' posts are always excluded. Follow/like/repost arrays are compatibility projections over normalized relationship tables, not authoritative client-writable arrays.
 
-DM queries are always restricted to participants before applying caller filters. Notifications are restricted to the recipient. Other users' bookmark paths are rejected. Public user views never include email, password hash or session data.
+Notifications are restricted to the recipient. Other users' bookmark paths are rejected. Public user views never include email, password hash or session data.
 
 `GET /presence` records current user's activity and returns up to 100 recently active IDs. Changes are refreshed with polling; no Socket.IO or Firebase listener connection remains.
 
@@ -63,4 +61,4 @@ User and tweet UI types derive from generated DTOs, replacing only transport dat
 
 ## Extension boundary
 
-The API is one Go service, split into auth, posts, users, messages, query and media files. PostgreSQL outbox events are committed with post writes. SMTP delivery is an optional at-least-once worker using a trusted SMTP relay; events remain pending when unconfigured. Future ranking jobs can consume versioned events/SQL read models in a separate process without rewriting frontend mutations. No federation protocols or Rust application code are introduced.
+The API is one Go service, split into auth, posts, users, notifications, query and media files. PostgreSQL outbox events are committed with post writes. SMTP delivery is an optional at-least-once worker using a trusted SMTP relay; events remain pending when unconfigured. Future ranking jobs can consume versioned events/SQL read models in a separate process without rewriting frontend mutations. No federation protocols or Rust application code are introduced.

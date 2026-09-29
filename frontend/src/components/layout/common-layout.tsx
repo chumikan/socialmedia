@@ -62,7 +62,3 @@ export function ExploreLayout({ children }: LayoutProps): JSX.Element {
     </>
   );
 }
-
-export function MessageLayout({ children }: LayoutProps): JSX.Element {
-  return <>{children}</>;
-}

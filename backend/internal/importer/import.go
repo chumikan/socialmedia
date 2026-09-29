@@ -55,8 +55,6 @@ type Media struct {
 type Export struct {
 	Users         []Document            `json:"users"`
 	Tweets        []Document            `json:"tweets"`
-	Conversations []Document            `json:"conversations"`
-	Messages      []Document            `json:"messages"`
 	Notifications []Document            `json:"notifications"`
 	Bookmarks     map[string][]Document `json:"bookmarks"`
 	Media         []Media               `json:"media"`
@@ -64,6 +62,13 @@ type Export struct {
 }
 
 func (e Export) Validate() error {
+	for _, n := range e.Notifications {
+		switch n.String("type") {
+		case "follower", "liked", "reply", "repost":
+		default:
+			return fmt.Errorf("notification %s has unsupported type %q", n.String("id"), n.String("type"))
+		}
+	}
 	seen := map[string]bool{}
 	for _, u := range e.Users {
 		uid := u.String("id")
@@ -206,23 +211,6 @@ func (e Export) Apply(ctx context.Context, db *pgxpool.Pool) error {
 			if err = exec("INSERT INTO bookmarks(user_id,post_id,created_at) VALUES($1,$2,$3) ON CONFLICT DO NOTHING", uid, b.String("id"), b.Time("createdAt")); err != nil {
 				return err
 			}
-		}
-	}
-	for _, c := range e.Conversations {
-		if err = exec("INSERT INTO conversations(id,user_id,target_user_id,created_at,updated_at) VALUES($1,$2,$3,$4,$4) ON CONFLICT(id) DO NOTHING", c.String("id"), c.String("userId"), c.String("targetUserId"), c.Time("createdAt")); err != nil {
-			return err
-		}
-	}
-	for _, m := range e.Messages {
-		var member bool
-		if err = tx.QueryRow(ctx, "SELECT user_id=$2 OR target_user_id=$2 FROM conversations WHERE id=$1", m.String("conversationId"), m.String("userId")).Scan(&member); err != nil {
-			return err
-		}
-		if !member {
-			return fmt.Errorf("message %s has nonmember sender", m.String("id"))
-		}
-		if err = exec("INSERT INTO messages(id,conversation_id,user_id,text,created_at) VALUES($1,$2,$3,$4,$5) ON CONFLICT(id) DO NOTHING", m.String("id"), m.String("conversationId"), m.String("userId"), m.String("text"), m.Time("createdAt")); err != nil {
-			return err
 		}
 	}
 	for _, n := range e.Notifications {

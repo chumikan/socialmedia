@@ -14,7 +14,6 @@ export async function checkUsernameAvailability(
     [
       'home',
       'notifications',
-      'messages',
       'bookmarks',
       'explore',
       'api',
