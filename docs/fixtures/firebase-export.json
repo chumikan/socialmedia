@@ -1,0 +1,13 @@
+{
+  "users": [
+    {"id":"legacy-a","username":"legacy_a","name":"Legacy A","createdAt":{"_seconds":1700000000,"_nanoseconds":0},"following":["legacy-b"]},
+    {"id":"legacy-b","username":"legacy_b","name":"Legacy B","createdAt":"2023-11-14T22:13:20Z","following":[]}
+  ],
+  "authUsers": [{"localId":"legacy-a","email":"legacy-a@example.test","passwordHash":"not-imported"}],
+  "tweets": [{"id":"legacy-post","createdBy":"legacy-b","text":"Offline #migration","createdAt":"2023-11-14T22:13:20Z","parent":null,"images":[],"userLikes":["legacy-a"],"userRetweets":["legacy-a"]}],
+  "bookmarks": {"legacy-a":[{"id":"legacy-post","createdAt":"2023-11-14T22:13:20Z"}]},
+  "conversations": [{"id":"legacy-conversation","userId":"legacy-a","targetUserId":"legacy-b","createdAt":"2023-11-14T22:13:20Z"}],
+  "messages": [{"id":"legacy-message","conversationId":"legacy-conversation","userId":"legacy-a","text":"Offline DM","createdAt":"2023-11-14T22:13:20Z"}],
+  "notifications": [],
+  "media": []
+}

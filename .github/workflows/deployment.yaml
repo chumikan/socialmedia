@@ -1,48 +1,54 @@
-name: Deploy 🚀
-
-on:
-  push:
-    branches: ['main']
-  pull_request:
-    branches: ['main']
-
+name: Validate monorepo
+on: [push, pull_request]
 jobs:
-  prettier:
-    name: 🧪 Prettier
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test-only
+          POSTGRES_DB: socialmedia_test
+        ports: ['5432:5432']
+        options: --health-cmd 'pg_isready -U test -d socialmedia_test' --health-interval 3s --health-retries 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/go.mod
+          cache-dependency-path: backend/go.sum
+      - run: go vet ./... && go test -race ./... -count=1
+        working-directory: backend
+        env:
+          TEST_DATABASE_URL: postgres://test:test-only@localhost:5432/socialmedia_test?sslmode=disable
+      - run: go run ./cmd/contracts > /tmp/contracts.ts && diff -u ../frontend/src/lib/api/contracts.ts /tmp/contracts.ts
+        working-directory: backend
+  frontend:
     runs-on: ubuntu-latest
     steps:
-      - name: ⬇️ Checkout repo
-        uses: actions/checkout@v3
-
-      - name: 📥 Download deps
-        run: npm ci
-
-      - name: 🔍 Format
-        run: npm run format
-
-  eslint:
-    name: ✅ ESLint
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci && npm run typecheck && npm run lint && npm run build
+        working-directory: frontend
+  e2e:
     runs-on: ubuntu-latest
     steps:
-      - name: ⬇️ Checkout repo
-        uses: actions/checkout@v3
-
-      - name: 📥 Download deps
-        run: npm ci
-
-      - name: 🪄 Lint
-        run: npm run lint
-
-  jest:
-    name: 🃏 Jest
-    runs-on: ubuntu-latest
-    steps:
-      - name: ⬇️ Checkout repo
-        uses: actions/checkout@v3
-
-      - name: 📥 Download deps
-        run: npm ci
-
-      # ! uncomment this after you add test
-      # - name: 🔬 Test
-      # run: npm run test:ci
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: |
+          printf 'POSTGRES_PASSWORD=%s\nS3_ACCESS_KEY=ci-sns\nS3_SECRET_KEY=%s\n' "$(openssl rand -hex 24)" "$(openssl rand -hex 24)" > .env
+          docker compose up --build -d
+          timeout 120 sh -c 'until curl -fsS http://localhost:3000/api/v1/health; do sleep 2; done'
+      - run: npm ci && npx playwright install --with-deps chromium && npm test
+        working-directory: frontend
+      - if: failure()
+        run: docker compose logs --tail=100 backend frontend
+      - if: always()
+        run: docker compose down -v

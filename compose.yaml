@@ -1,0 +1,63 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: socialmedia
+      POSTGRES_USER: socialmedia
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - '127.0.0.1:${POSTGRES_PORT:-5433}:5432'
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U socialmedia -d socialmedia']
+      interval: 3s
+      timeout: 3s
+      retries: 20
+  s3:
+    image: chrislusf/seaweedfs:4.47
+    command: mini -dir=/data -ip.bind=0.0.0.0
+    environment:
+      AWS_ACCESS_KEY_ID: ${S3_ACCESS_KEY:?Set S3_ACCESS_KEY in .env}
+      AWS_SECRET_ACCESS_KEY: ${S3_SECRET_KEY:?Set S3_SECRET_KEY in .env}
+      S3_BUCKET: socialmedia
+    ports:
+      - '127.0.0.1:9000:8333'
+    volumes:
+      - s3-data:/data
+  backend:
+    build: ./backend
+    environment:
+      DATABASE_URL: postgres://socialmedia:${POSTGRES_PASSWORD}@postgres:5432/socialmedia?sslmode=disable
+      APP_ORIGIN: ${APP_ORIGIN:-http://localhost:3000}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      S3_ENDPOINT: s3:8333
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY}
+      S3_SECRET_KEY: ${S3_SECRET_KEY}
+      S3_BUCKET: socialmedia
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      SMTP_ADDR: ${SMTP_ADDR:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+      SMTP_TO: ${SMTP_TO:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      s3:
+        condition: service_started
+    ports:
+      - '127.0.0.1:${API_PORT:-8081}:8080'
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        API_INTERNAL_URL: http://backend:8080
+    environment:
+      API_INTERNAL_URL: http://backend:8080
+    depends_on:
+      - backend
+    ports:
+      - '127.0.0.1:3000:3000'
+volumes:
+  postgres-data:
+  s3-data:

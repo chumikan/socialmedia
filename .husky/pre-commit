@@ -1,6 +1,3 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
-
-exec 1> /dev/tty
-
-npx lint-staged
+cd frontend && npx lint-staged
