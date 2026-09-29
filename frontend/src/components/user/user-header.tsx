@@ -1,6 +1,7 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { getProfileUsername } from '@lib/profile-route';
 import { doc } from '@lib/api/query';
 import { useDocument } from '@lib/hooks/useDocument';
 import { useUser } from '@lib/context/user-context';
@@ -20,8 +21,9 @@ export const variants: Variants = {
 export function UserHeader(): JSX.Element {
   const {
     pathname,
-    query: { id }
+    query: { username: usernameSegment }
   } = useRouter();
+  const username = getProfileUsername(usernameSegment);
   const { user, loading: userLoading } = useUser();
   const userId = user?.id ?? null;
 
@@ -66,7 +68,7 @@ export function UserHeader(): JSX.Element {
       {showContent === 'not-found' && (
         <motion.div {...variants} key='not-found'>
           <h2 className='text-xl font-bold'>
-            {isInFollowPage ? `@${id as string}` : 'User'}
+            {isInFollowPage ? `@${username as string}` : 'User'}
           </h2>
         </motion.div>
       )}

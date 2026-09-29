@@ -23,7 +23,7 @@ export function UserAvatar({
 
   return (
     <Link
-      href={username ? `/${username}` : '#'}
+      href={username ? `/@${username}` : '#'}
       className={cn(
         'blur-picture flex self-start',
         !username && 'pointer-events-none',

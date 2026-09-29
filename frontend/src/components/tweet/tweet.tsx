@@ -60,7 +60,7 @@ export function Tweet(tweet: TweetProps): JSX.Element {
 
   const { open, openModal, closeModal } = useModal();
 
-  const tweetLink = `/${username}/status/${tweetId}`;
+  const tweetLink = `/@${username}/status/${tweetId}`;
 
   const userId = user?.id as string;
 
@@ -116,7 +116,7 @@ export function Tweet(tweet: TweetProps): JSX.Element {
               tweetIsRetweeted && (
                 <TweetStatus type='tweet'>
                   <Link
-                    href={profileUsername as string}
+                    href={`/@${profileUsername as string}`}
                     className='custom-underline truncate text-sm font-bold'
                   >
                     {userId === profileId ? (
@@ -169,6 +169,7 @@ export function Tweet(tweet: TweetProps): JSX.Element {
                     ownerId={ownerId}
                     tweetId={tweetId}
                     parentId={parentId}
+                    parentUsername={parentUsername}
                     username={username}
                     hasImages={!!images}
                     createdBy={createdBy}
@@ -185,7 +186,7 @@ export function Tweet(tweet: TweetProps): JSX.Element {
               >
                 Replying to{' '}
                 <Link
-                  href={`/${parentUsername}`}
+                  href={`/@${parentUsername}`}
                   className='custom-underline text-main-accent'
                 >
                   @{parentUsername}
@@ -218,6 +219,7 @@ export function Tweet(tweet: TweetProps): JSX.Element {
                   isOwner={isOwner}
                   tweetId={tweetId}
                   tweetCreatedBy={createdBy}
+                  username={username}
                   userLikes={userLikes}
                   userReplies={userReplies}
                   userRetweets={userRetweets}

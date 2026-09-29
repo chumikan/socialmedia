@@ -1,6 +1,7 @@
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import cn from 'clsx';
+import { getProfileUsername } from '@lib/profile-route';
 
 import type { JSX } from 'react';
 
@@ -12,10 +13,11 @@ type UserNavLinkProps = {
 export function UserNavLink({ name, path }: UserNavLinkProps): JSX.Element {
   const {
     asPath,
-    query: { username }
+    query: { username: usernameSegment }
   } = useRouter();
+  const username = getProfileUsername(usernameSegment);
 
-  const userPath = `/${username as string}${path ? `/${path}` : ''}`;
+  const userPath = `/@${username as string}${path ? `/${path}` : ''}`;
 
   return (
     <Link

@@ -132,7 +132,7 @@ export function Sidebar(): JSX.Element {
               <SidebarLink {...linkData} key={linkData.href} />
             ))}
             <SidebarLink
-              href={`/${username}`}
+              href={`/@${username}`}
               username={username}
               linkName='Profile'
               icon={<CiUser size={34} />}

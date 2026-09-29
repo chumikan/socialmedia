@@ -1,4 +1,5 @@
 import { useRouter } from 'next/router';
+import { getProfileUsername } from '@lib/profile-route';
 import { query, where, limit } from '@lib/api/query';
 import { UserContextProvider } from '@lib/context/user-context';
 import { useCollection } from '@lib/hooks/useCollection';
@@ -13,9 +14,10 @@ import type { JSX } from 'react';
 
 export function UserDataLayout({ children }: LayoutProps): JSX.Element {
   const {
-    query: { username },
+    query: { username: usernameSegment },
     back
   } = useRouter();
+  const username = getProfileUsername(usernameSegment);
 
   const { data, loading } = useCollection(
     query(usersCollection, where('username', '==', username), limit(1)),

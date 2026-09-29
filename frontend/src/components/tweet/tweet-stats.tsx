@@ -23,6 +23,7 @@ type TweetStatsProps = Pick<
   isOwner: boolean;
   tweetId: string;
   tweetCreatedBy: string;
+  username: string;
   viewTweet?: boolean;
   openModal?: () => void;
 };
@@ -32,6 +33,7 @@ export function TweetStats({
   userId,
   tweetId,
   tweetCreatedBy,
+  username,
   userLikes,
   viewTweet,
   userRetweets,
@@ -196,7 +198,11 @@ export function TweetStats({
             />
           </button>
         </div>
-        <TweetShare userId={userId} tweetId={tweetId} viewTweet={viewTweet} />
+        <TweetShare
+          username={username}
+          tweetId={tweetId}
+          viewTweet={viewTweet}
+        />
       </div>
     </>
   );

@@ -26,7 +26,7 @@ export function UserName({
 
   return (
     <Link
-      href={username ? `/${username}` : '#'}
+      href={username ? `/@${username}` : '#'}
       className={cn(
         'flex items-center gap-1 truncate font-bold',
         username ? 'custom-underline' : 'pointer-events-none',

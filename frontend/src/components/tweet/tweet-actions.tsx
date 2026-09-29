@@ -36,6 +36,7 @@ type TweetActionsProps = Pick<Tweet, 'createdBy'> & {
   tweetId: string;
   username: string;
   parentId?: string;
+  parentUsername: string;
   hasImages: boolean;
   viewTweet?: boolean;
 };
@@ -61,6 +62,7 @@ export function TweetActions({
   isOwner,
   tweetId,
   parentId,
+  parentUsername,
   username,
   viewTweet,
   createdBy
@@ -90,7 +92,9 @@ export function TweetActions({
       if (parentId) {
         const parentSnapshot = await getDoc(doc(tweetsCollection, parentId));
         if (parentSnapshot.exists()) {
-          await push(`/${username}/${parentId}`, undefined, { scroll: false });
+          await push(`/@${parentUsername}/status/${parentId}`, undefined, {
+            scroll: false
+          });
           delayScroll(200)();
           await sleep(50);
         } else await push('/home');

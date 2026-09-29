@@ -99,7 +99,7 @@ export function Input({
           <span className='flex gap-2'>
             Your Tweet was sent
             <Link
-              href={`/${username}/status/${tweetId}`}
+              href={`/@${username}/status/${tweetId}`}
               className='custom-underline font-bold'
             >
               View
@@ -218,7 +218,7 @@ export function Input({
         >
           Replying to{' '}
           <Link
-            href={`/${parent?.username as string}`}
+            href={`/@${parent?.username as string}`}
             className='custom-underline text-main-accent'
           >
             {parent?.username as string}

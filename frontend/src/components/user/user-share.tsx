@@ -18,7 +18,7 @@ type UserShareProps = {
 export function UserShare({ username }: UserShareProps): JSX.Element {
   const handleCopy = (closeMenu: () => void) => async (): Promise<void> => {
     closeMenu();
-    await navigator.clipboard.writeText(`${siteURL}/${username}`);
+    await navigator.clipboard.writeText(`${siteURL}/@${username}`);
     toast.success('Copied to clipboard');
   };
 

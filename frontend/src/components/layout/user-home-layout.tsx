@@ -2,6 +2,7 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
+import { getProfileUsername } from '@lib/profile-route';
 import { api } from '@lib/api/client';
 import { useAuth } from '@lib/context/auth-context';
 import { useUser } from '@lib/context/user-context';
@@ -25,8 +26,9 @@ export const UserHomeLayout = ({ children }: LayoutProps): JSX.Element => {
   const { user: userData, loading } = useUser();
 
   const {
-    query: { username }
+    query: { username: usernameSegment }
   } = useRouter();
+  const username = getProfileUsername(usernameSegment);
 
   const coverData = userData?.coverPhotoURL
     ? { src: userData.coverPhotoURL, alt: userData.name }

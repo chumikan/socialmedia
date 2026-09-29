@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo, type JSX } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { getProfileUsername } from '@lib/profile-route';
 import { NumberStats } from '@components/tweet/number-stats';
 import type { User } from '@lib/types/user';
 
@@ -39,10 +40,11 @@ export function UserFollowStats({
   );
 
   const {
-    query: { username }
+    query: { username: usernameSegment }
   } = useRouter();
+  const username = getProfileUsername(usernameSegment);
 
-  const userPath = `/${username as string}`;
+  const userPath = `/@${username as string}`;
 
   const allStats: Readonly<Stats[]> = [
     ['Following', `${userPath}/following`, followingMove, currentFollowing],

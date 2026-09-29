@@ -2,34 +2,30 @@ import cn from 'clsx';
 import { Popover } from '@headlessui/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
-import { useAuth } from '@lib/context/auth-context';
 import { preventBubbling } from '@lib/utils';
 import { siteURL } from '@lib/env';
 import { Button } from '@components/ui/button';
 import { HeroIcon } from '@components/ui/hero-icon';
 import { ToolTip } from '@components/ui/tooltip';
 import { variants } from './tweet-actions';
-import type { User } from '@lib/types/user';
 
 import type { JSX } from 'react';
 
 type TweetShareProps = {
-  userId: string;
+  username: string;
   tweetId: string;
   viewTweet?: boolean;
 };
 
 export function TweetShare({
   tweetId,
+  username,
   viewTweet
 }: TweetShareProps): JSX.Element {
-  const { user } = useAuth();
-  const { username } = user as User;
-
   const handleCopy = (closeMenu: () => void) => async (): Promise<void> => {
     closeMenu();
     await navigator.clipboard.writeText(
-      `${siteURL}/${username}/status/${tweetId}`
+      `${siteURL}/@${username}/status/${tweetId}`
     );
     toast.success('Copied to clipboard');
   };

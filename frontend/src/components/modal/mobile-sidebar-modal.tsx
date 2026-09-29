@@ -95,7 +95,7 @@ export function MobileSidebarModal({
     ['followers', 'Followers', followers.length]
   ];
 
-  const userLink = `/${username}`;
+  const userLink = `/@${username}`;
 
   return (
     <>
@@ -184,7 +184,7 @@ export function MobileSidebarModal({
           <i className='h-0.5 bg-light-line-reply dark:bg-dark-line-reply' />
           <nav className='flex flex-col'>
             <MobileSidebarLink
-              href={`/${username}`}
+              href={`/@${username}`}
               iconName='UserIcon'
               linkName='Profile'
             />

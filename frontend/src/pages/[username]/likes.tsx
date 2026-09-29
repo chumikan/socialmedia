@@ -63,3 +63,5 @@ UserLikes.getLayout = (page: ReactElement<unknown>): ReactNode => (
     </MainLayout>
   </ProtectedLayout>
 );
+
+export { getProfilePageProps as getServerSideProps } from '@lib/profile-route';

@@ -49,6 +49,6 @@ export const NotificationTypes = (notification: NotificationWithUser) => {
   return {
     ...userInfo,
     image_url: notification.user.photoURL,
-    url: `/${notification.user.username}`
+    url: `/@${notification.user.username}`
   };
 };

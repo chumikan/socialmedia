@@ -44,7 +44,7 @@ test('register, publish, follow, interact, reply, bookmark, profile, notificatio
     headers,
     data: { text: `followed post ${suffix}`, parentId: null, mediaIds: [] }
   });
-  await page.goto(`/${other.username}`);
+  await page.goto(`/@${other.username}`);
   await page
     .getByRole('button', { name: 'Follow', exact: true })
     .first()
@@ -80,13 +80,13 @@ test('register, publish, follow, interact, reply, bookmark, profile, notificatio
   await expect(
     page.getByText(`followed post ${suffix}`, { exact: true })
   ).toBeVisible();
-  await page.goto(`/${other.username}/status/${post.id}`);
+  await page.goto(`/@${other.username}/status/${post.id}`);
   await page.getByPlaceholder('Tweet your reply').fill(`reply ${suffix}`);
   await page.getByRole('button', { name: 'Reply', exact: true }).last().click();
   await expect(
     page.getByText(`reply ${suffix}`, { exact: true })
   ).toBeVisible();
-  await page.goto(`/${me.username}`);
+  await page.goto(`/@${me.username}`);
   await page.getByRole('button', { name: 'Edit profile', exact: true }).click();
   await page
     .getByRole('textbox', { name: 'Name', exact: true })

@@ -2,6 +2,8 @@
 
 既存のNext.js画面を利用するSNSです。認証・投稿・フォロー・時系列フィード・返信・いいね・リポスト・ブックマーク・プロフィール・検索・通知・BANをGo APIで処理し、画像/動画はS3互換ストレージへ保存します。
 
+プロフィールURLは`/@username`、Tweet詳細は`/@username/status/{tweetId}`です。ディレクトリ名は`[username]`を使用し、URLパラメータの`@`を取り除いてAPI・DBのusernameとして扱います。`@`なしのプロフィールURLは404となり、転送しません。
+
 - `frontend/`: Next.js Pages Router / TypeScript / Tailwind
 - `backend/`: 単一Go API、PostgreSQLマイグレーション、テスト、管理・インポートCLI
 - `docs/`: [移行計画](docs/migration-plan.md)、[API契約](docs/api-contract.md)、[オフライン移行手順](docs/firebase-import.md)

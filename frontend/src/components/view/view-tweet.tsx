@@ -46,7 +46,7 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
 
   const { open, openModal, closeModal } = useModal();
 
-  const tweetLink = `/${username}/status/${tweetId}`;
+  const tweetLink = `/@${username}/status/${tweetId}`;
 
   const userId = user?.id as string;
 
@@ -111,6 +111,7 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
                 ownerId={ownerId}
                 tweetId={tweetId}
                 parentId={parentId}
+                parentUsername={parentUsername}
                 username={username}
                 hasImages={!!images}
                 createdBy={createdBy}
@@ -123,7 +124,7 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
         <p className='text-light-secondary dark:text-dark-secondary'>
           Replying to{' '}
           <Link
-            href={`/${parentUsername}`}
+            href={`/@${parentUsername}`}
             className='custom-underline text-main-accent'
           >
             @{parentUsername}
@@ -161,6 +162,7 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
             isOwner={isOwner}
             tweetId={tweetId}
             tweetCreatedBy={createdBy}
+            username={username}
             userLikes={userLikes}
             userRetweets={userRetweets}
             userReplies={userReplies}
