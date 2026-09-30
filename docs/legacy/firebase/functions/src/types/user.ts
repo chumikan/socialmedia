@@ -16,9 +16,9 @@ export type User = {
   followers: string[];
   createdAt: Timestamp;
   updatedAt: Timestamp | null;
-  totalTweets: number;
+  totalPosts: number;
   totalPhotos: number;
-  pinnedTweet: string | null;
+  pinnedPost: string | null;
   coverPhotoURL: string | null;
 };
 

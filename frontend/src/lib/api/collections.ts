@@ -1,6 +1,6 @@
 import { collection } from '@lib/api/query';
 import { userConverter } from '@lib/types/user';
-import { tweetConverter } from '@lib/types/tweet';
+import { postConverter } from '@lib/types/post';
 import { bookmarkConverter } from '@lib/types/bookmark';
 import { notificationConverter } from '@lib/types/notification';
 import { statsConverter } from '@lib/types/stats';
@@ -11,8 +11,7 @@ import type { Stats } from '@lib/types/stats';
 
 export const usersCollection = collection('users').withConverter(userConverter);
 
-export const tweetsCollection =
-  collection('tweets').withConverter(tweetConverter);
+export const postsCollection = collection('posts').withConverter(postConverter);
 
 export const trendsCollection =
   collection('trends').withConverter(trendConverter);

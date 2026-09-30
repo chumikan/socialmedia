@@ -9,10 +9,10 @@ import {
 import { useInfiniteScroll } from '@lib/hooks/useInfiniteScroll';
 import { query, where, orderBy, startAt, endAt, limit } from '@lib/api/query';
 import { useCollection } from '@lib/hooks/useCollection';
-import { tweetsCollection, usersCollection } from '@lib/api/collections';
+import { postsCollection, usersCollection } from '@lib/api/collections';
 import { useDebounce } from '@lib/hooks/useDebounce';
 import { useAuth } from '@lib/context/auth-context';
-import { Tweet } from '@components/tweet/tweet';
+import { Post } from '@components/post/post';
 import { MainContainer } from '@components/home/main-container';
 import {
   ExploreLayout,
@@ -53,7 +53,7 @@ export default function SearchPage(): JSX.Element {
   const debouncedInput = useDebounce(input, 500);
 
   const { data: posts, LoadMore } = useInfiniteScroll(
-    tweetsCollection,
+    postsCollection,
     [where('text', 'search', debouncedInput), orderBy('createdAt', 'desc')],
     { includeUser: true }
   );
@@ -106,7 +106,7 @@ export default function SearchPage(): JSX.Element {
             <UsersList users={dataUsers} />
           )}
           {posts?.map((post) => (
-            <Tweet key={post.id} {...post} />
+            <Post key={post.id} {...post} />
           ))}
           <LoadMore />
         </section>

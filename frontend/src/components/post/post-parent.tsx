@@ -1,29 +1,29 @@
 import { useMemo, useEffect, type JSX } from 'react';
 import { doc } from '@lib/api/query';
 import { useDocument } from '@lib/hooks/useDocument';
-import { tweetsCollection } from '@lib/api/collections';
+import { postsCollection } from '@lib/api/collections';
 import { getRandomId } from '@lib/random';
-import { Tweet } from './tweet';
-import type { LoadedParents } from './tweet-with-parent';
+import { Post } from './post';
+import type { LoadedParents } from './post-with-parent';
 
-type TweetParentProps = {
+type PostParentProps = {
   parentId: string;
   loadedParents: LoadedParents;
   addParentId: (parentId: string, componentId: string) => void;
 };
 
-export function TweetParent({
+export function PostParent({
   parentId,
   loadedParents,
   addParentId
-}: TweetParentProps): JSX.Element | null {
+}: PostParentProps): JSX.Element | null {
   const componentId = useMemo(getRandomId, []);
 
   const isParentAlreadyLoaded = loadedParents.some(
     (child) => child.childId === componentId
   );
 
-  const { data, loading } = useDocument(doc(tweetsCollection, parentId), {
+  const { data, loading } = useDocument(doc(postsCollection, parentId), {
     includeUser: true,
     allowNull: true,
     disabled: isParentAlreadyLoaded
@@ -36,5 +36,5 @@ export function TweetParent({
 
   if (loading || !isParentAlreadyLoaded || !data) return null;
 
-  return <Tweet parentTweet {...data} />;
+  return <Post parentPost {...data} />;
 }

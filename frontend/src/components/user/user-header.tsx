@@ -46,14 +46,14 @@ export function UserHeader(): JSX.Element {
     else setShowContent('found');
   }, [userLoading, statsLoading, user]);
 
-  const { tweets } = statsData ?? {};
-  const [totalTweets, totalPhotos] = [
-    (user?.totalTweets ?? 0) + (tweets?.length ?? 0),
+  const { posts } = statsData ?? {};
+  const [totalPosts, totalPhotos] = [
+    (user?.totalPosts ?? 0) + (posts?.length ?? 0),
     user?.totalPhotos
   ];
 
   const currentPage = pathname.split('/').pop() ?? '';
-  const isInTweetPage = ['[username]', 'with_replies'].includes(currentPage);
+  const isInPostPage = ['[username]', 'with_replies'].includes(currentPage);
   const isInFollowPage = ['following', 'followers'].includes(currentPage);
 
   return (
@@ -85,11 +85,11 @@ export function UserHeader(): JSX.Element {
           <p className='text-xs text-light-secondary dark:text-dark-secondary'>
             {isInFollowPage
               ? `@${user?.username ?? ''}`
-              : isInTweetPage
-              ? totalTweets
-                ? `${totalTweets} ${`Tweet${isPlural(totalTweets)}`}`
+              : isInPostPage
+              ? totalPosts
+                ? `${totalPosts} ${`Post${isPlural(totalPosts)}`}`
                 : user
-                ? '0 Tweets'
+                ? '0 Posts'
                 : ''
               : currentPage === 'media'
               ? totalPhotos
@@ -97,9 +97,9 @@ export function UserHeader(): JSX.Element {
                     totalPhotos
                   )} & video${isPlural(totalPhotos)}`
                 : '0 photos & videos'
-              : totalTweets
-              ? `${totalTweets} Tweet${isPlural(totalTweets)}`
-              : '0 Tweets'}
+              : totalPosts
+              ? `${totalPosts} Post${isPlural(totalPosts)}`
+              : '0 Posts'}
           </p>
         </motion.div>
       )}

@@ -16,12 +16,12 @@ type UserDTO struct {
 	Verified      bool     `json:"verified"`
 	IsAdmin       bool     `json:"isAdmin"`
 	IsBanned      bool     `json:"isBanned"`
-	PinnedTweet   *string  `json:"pinnedTweet"`
+	PinnedPost    *string  `json:"pinnedPost"`
 	CreatedAt     string   `json:"createdAt"`
 	UpdatedAt     *string  `json:"updatedAt"`
 	Following     []string `json:"following"`
 	Followers     []string `json:"followers"`
-	TotalTweets   int      `json:"totalTweets"`
+	TotalPosts    int      `json:"totalPosts"`
 	TotalPhotos   int      `json:"totalPhotos"`
 }
 type MediaDTO struct {
@@ -34,15 +34,15 @@ type ParentDTO struct {
 	ID       string `json:"id"`
 	Username string `json:"username"`
 }
-type TweetDTO struct {
-	ID           string      `json:"id"`
-	Text         *string     `json:"text"`
-	Images       *[]MediaDTO `json:"images"`
-	Parent       *ParentDTO  `json:"parent"`
-	CreatedBy    string      `json:"createdBy"`
-	CreatedAt    string      `json:"createdAt"`
-	UpdatedAt    *string     `json:"updatedAt"`
-	UserLikes    []string    `json:"userLikes"`
-	UserRetweets []string    `json:"userRetweets"`
-	UserReplies  int         `json:"userReplies"`
+type PostDTO struct {
+	ID          string      `json:"id"`
+	Text        *string     `json:"text"`
+	Images      *[]MediaDTO `json:"images"`
+	Parent      *ParentDTO  `json:"parent"`
+	CreatedBy   string      `json:"createdBy"`
+	CreatedAt   string      `json:"createdAt"`
+	UpdatedAt   *string     `json:"updatedAt"`
+	UserLikes   []string    `json:"userLikes"`
+	UserReposts []string    `json:"userReposts"`
+	UserReplies int         `json:"userReplies"`
 }

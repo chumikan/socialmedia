@@ -1,15 +1,15 @@
 import { useState, type JSX } from 'react';
-import { Tweet } from './tweet';
-import { TweetParent } from './tweet-parent';
-import type { TweetWithUser } from '@lib/types/tweet';
+import { Post } from './post';
+import { PostParent } from './post-parent';
+import type { PostWithUser } from '@lib/types/post';
 
-type TweetWithParentProps = {
-  data: TweetWithUser[];
+type PostWithParentProps = {
+  data: PostWithUser[];
 };
 
 export type LoadedParents = Record<'parentId' | 'childId', string>[];
 
-export function TweetWithParent({ data }: TweetWithParentProps): JSX.Element {
+export function PostWithParent({ data }: PostWithParentProps): JSX.Element {
   const [loadedParents, setLoadedParents] = useState<LoadedParents>([]);
 
   const addParentId = (parentId: string, targetChildId: string): void =>
@@ -25,16 +25,16 @@ export function TweetWithParent({ data }: TweetWithParentProps): JSX.Element {
 
   return (
     <>
-      {filteredData.map((tweet) => (
-        <div className='[&>article:nth-child(2)]:-mt-1' key={tweet.id}>
-          {tweet.parent && (
-            <TweetParent
-              parentId={tweet.parent.id}
+      {filteredData.map((post) => (
+        <div className='[&>article:nth-child(2)]:-mt-1' key={post.id}>
+          {post.parent && (
+            <PostParent
+              parentId={post.parent.id}
               loadedParents={loadedParents}
               addParentId={addParentId}
             />
           )}
-          <Tweet {...tweet} />
+          <Post {...post} />
         </div>
       ))}
     </>

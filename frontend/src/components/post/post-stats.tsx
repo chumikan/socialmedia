@@ -5,60 +5,60 @@ import { useState, useEffect, useMemo, type JSX } from 'react';
 import cn from 'clsx';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '@lib/context/auth-context';
-import { manageRetweet, manageLike, manageBookmark } from '@lib/api/utils';
+import { manageRepost, manageLike, manageBookmark } from '@lib/api/utils';
 import { preventBubbling } from '@lib/utils';
-import { ViewTweetStats } from '@components/view/view-tweet-stats';
+import { ViewPostStats } from '@components/view/view-post-stats';
 import { HeroIcon } from '@components/ui/hero-icon';
 import { ToolTip } from '@components/ui/tooltip';
-import { TweetOption } from '@components/tweet/tweet-option';
-import { TweetShare } from '@components/tweet/tweet-share';
-import type { Tweet } from '@lib/types/tweet';
+import { PostOption } from '@components/post/post-option';
+import { PostShare } from '@components/post/post-share';
+import type { Post } from '@lib/types/post';
 
-type TweetStatsProps = Pick<
-  Tweet,
-  'userLikes' | 'userRetweets' | 'userReplies'
+type PostStatsProps = Pick<
+  Post,
+  'userLikes' | 'userReposts' | 'userReplies'
 > & {
   reply?: boolean;
   userId: string;
   isOwner: boolean;
-  tweetId: string;
-  tweetCreatedBy: string;
+  postId: string;
+  postCreatedBy: string;
   username: string;
-  viewTweet?: boolean;
+  viewPost?: boolean;
   openModal?: () => void;
 };
 
-export function TweetStats({
+export function PostStats({
   reply,
   userId,
-  tweetId,
-  tweetCreatedBy,
+  postId,
+  postCreatedBy,
   username,
   userLikes,
-  viewTweet,
-  userRetweets,
+  viewPost,
+  userReposts,
   userReplies: totalReplies,
   openModal
-}: TweetStatsProps): JSX.Element {
+}: PostStatsProps): JSX.Element {
   const { userBookmarks } = useAuth();
 
   const totalLikes = userLikes.length;
-  const totalTweets = userRetweets.length;
+  const totalPosts = userReposts.length;
 
-  const [{ currentReplies, currentTweets, currentLikes }, setCurrentStats] =
+  const [{ currentReplies, currentPosts, currentLikes }, setCurrentStats] =
     useState({
       currentReplies: totalReplies,
       currentLikes: totalLikes,
-      currentTweets: totalTweets
+      currentPosts: totalPosts
     });
 
   useEffect(() => {
     setCurrentStats({
       currentReplies: totalReplies,
       currentLikes: totalLikes,
-      currentTweets: totalTweets
+      currentPosts: totalPosts
     });
-  }, [totalReplies, totalLikes, totalTweets]);
+  }, [totalReplies, totalLikes, totalPosts]);
 
   const replyMove = useMemo(
     () => (totalReplies > currentReplies ? -25 : 25),
@@ -70,9 +70,9 @@ export function TweetStats({
     [totalLikes]
   );
 
-  const tweetMove = useMemo(
-    () => (totalTweets > currentTweets ? -25 : 25),
-    [totalTweets]
+  const postMove = useMemo(
+    () => (totalPosts > currentPosts ? -25 : 25),
+    [totalPosts]
   );
 
   const handleBookmark =
@@ -86,34 +86,34 @@ export function TweetStats({
         type === 'bookmark'
           ? (): JSX.Element => (
               <span className='flex gap-2'>
-                Tweet added to your bookmarks
+                Post added to your bookmarks
                 <Link href='/bookmarks'>
                   <span className='custom-underline font-bold'>View</span>
                 </Link>
               </span>
             )
-          : 'Tweet removed from your bookmarks'
+          : 'Post removed from your bookmarks'
       );
     };
 
-  const tweetIsBookmarked = !!userBookmarks?.some(({ id }) => id === tweetId);
+  const postIsBookmarked = !!userBookmarks?.some(({ id }) => id === postId);
 
-  const tweetIsLiked = userLikes.includes(userId);
-  const tweetIsRetweeted = userRetweets.includes(userId);
+  const postIsLiked = userLikes.includes(userId);
+  const postIsReposted = userReposts.includes(userId);
 
-  const isStatsVisible = !!(totalReplies || totalTweets || totalLikes);
+  const isStatsVisible = !!(totalReplies || totalPosts || totalLikes);
 
   return (
     <>
-      {viewTweet && (
-        <ViewTweetStats
+      {viewPost && (
+        <ViewPostStats
           likeMove={likeMove}
           userLikes={userLikes}
-          tweetMove={tweetMove}
+          postMove={postMove}
           replyMove={replyMove}
-          userRetweets={userRetweets}
+          userReposts={userReposts}
           currentLikes={currentLikes}
-          currentTweets={currentTweets}
+          currentPosts={currentPosts}
           currentReplies={currentReplies}
           isStatsVisible={isStatsVisible}
         />
@@ -121,10 +121,10 @@ export function TweetStats({
       <div
         className={cn(
           'flex text-light-secondary inner:outline-none dark:text-dark-secondary',
-          viewTweet ? 'justify-around py-2' : 'max-w-md justify-between'
+          viewPost ? 'justify-around py-2' : 'max-w-md justify-between'
         )}
       >
-        <TweetOption
+        <PostOption
           className='hover:text-accent-blue focus-visible:text-accent-blue'
           iconClassName='group-hover:bg-accent-blue/10 group-active:bg-accent-blue/20 
                          group-focus-visible:bg-accent-blue/10 group-focus-visible:ring-accent-blue/80'
@@ -132,55 +132,55 @@ export function TweetStats({
           move={replyMove}
           stats={currentReplies}
           iconName='ChatBubbleOvalLeftIcon'
-          viewTweet={viewTweet}
+          viewPost={viewPost}
           onClick={openModal}
           disabled={reply}
         />
-        <TweetOption
+        <PostOption
           className={cn(
             'hover:text-accent-green focus-visible:text-accent-green',
-            tweetIsRetweeted && 'text-accent-green [&>i>svg]:[stroke-width:2px]'
+            postIsReposted && 'text-accent-green [&>i>svg]:[stroke-width:2px]'
           )}
           iconClassName='group-hover:bg-accent-green/10 group-active:bg-accent-green/20
                          group-focus-visible:bg-accent-green/10 group-focus-visible:ring-accent-green/80'
-          tip={tweetIsRetweeted ? 'Undo Retweet' : 'Retweet'}
-          move={tweetMove}
-          stats={currentTweets}
+          tip={postIsReposted ? 'Undo Repost' : 'Repost'}
+          move={postMove}
+          stats={currentPosts}
           iconName='ArrowPathRoundedSquareIcon'
-          viewTweet={viewTweet}
-          onClick={manageRetweet(
-            tweetIsRetweeted ? 'unretweet' : 'retweet',
+          viewPost={viewPost}
+          onClick={manageRepost(
+            postIsReposted ? 'unrepost' : 'repost',
             userId,
-            tweetId
+            postId
           )}
         />
-        <TweetOption
+        <PostOption
           className={cn(
             'hover:text-accent-pink focus-visible:text-accent-pink',
-            tweetIsLiked && 'text-accent-pink [&>i>svg]:fill-accent-pink'
+            postIsLiked && 'text-accent-pink [&>i>svg]:fill-accent-pink'
           )}
           iconClassName='group-hover:bg-accent-pink/10 group-active:bg-accent-pink/20
                          group-focus-visible:bg-accent-pink/10 group-focus-visible:ring-accent-pink/80'
-          tip={tweetIsLiked ? 'Unlike' : 'Like'}
+          tip={postIsLiked ? 'Unlike' : 'Like'}
           move={likeMove}
           stats={currentLikes}
           iconName='HeartIcon'
-          viewTweet={viewTweet}
-          onClick={manageLike(tweetIsLiked ? 'unlike' : 'like', userId, {
-            id: tweetId,
-            createdBy: tweetCreatedBy
-          } as Tweet)}
+          viewPost={viewPost}
+          onClick={manageLike(postIsLiked ? 'unlike' : 'like', userId, {
+            id: postId,
+            createdBy: postCreatedBy
+          } as Post)}
         />
         <div className='relative'>
           <button
-            aria-label={tweetIsBookmarked ? 'Unbookmark' : 'Bookmark'}
+            aria-label={postIsBookmarked ? 'Unbookmark' : 'Bookmark'}
             className='group relative flex items-center gap-1 p-0 outline-none 
                        transition-none hover:text-accent-blue focus-visible:text-accent-blue'
             onClick={preventBubbling(
               handleBookmark(
-                !tweetIsBookmarked ? 'bookmark' : 'unbookmark',
+                !postIsBookmarked ? 'bookmark' : 'unbookmark',
                 userId,
-                tweetId
+                postId
               )
             )}
           >
@@ -188,21 +188,17 @@ export function TweetStats({
               <HeroIcon
                 iconName='BookmarkIcon'
                 className={
-                  !tweetIsBookmarked ? 'h-5 w-auto' : 'h-5 w-auto fill-current'
+                  !postIsBookmarked ? 'h-5 w-auto' : 'h-5 w-auto fill-current'
                 }
               />
             </i>
             <ToolTip
-              tip={!tweetIsBookmarked ? 'Bookmark' : 'Unbookmark'}
+              tip={!postIsBookmarked ? 'Bookmark' : 'Unbookmark'}
               className='bottom-0'
             />
           </button>
         </div>
-        <TweetShare
-          username={username}
-          tweetId={tweetId}
-          viewTweet={viewTweet}
-        />
+        <PostShare username={username} postId={postId} viewPost={viewPost} />
       </div>
     </>
   );

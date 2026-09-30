@@ -141,8 +141,8 @@ export function Sidebar(): JSX.Element {
             {!isMobile && <MoreSettings />}
           </nav>
           <Button
-            aria-label='Tweet'
-            title='Tweet'
+            aria-label='Post'
+            title='Post'
             className='accent-tab absolute right-4 flex h-14 w-14 -translate-y-[72px] items-center justify-center rounded-full bg-main-accent p-0 text-white
                        outline-none transition hover:brightness-90 active:brightness-75 xs:static xs:translate-y-0
                        xs:hover:bg-main-accent/90 xs:active:bg-main-accent/75'

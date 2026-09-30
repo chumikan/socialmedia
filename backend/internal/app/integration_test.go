@@ -129,7 +129,7 @@ func TestIntegration(t *testing.T) {
 	if len(feed["items"].([]any)) != 1 {
 		t.Fatal("followed post missing from feed")
 	}
-	search := must("POST", "/query", q("tweets", Constraint{Kind: "where", Field: "text", Op: "search", Value: "hello"}), ac)
+	search := must("POST", "/query", q("posts", Constraint{Kind: "where", Field: "text", Op: "search", Value: "hello"}), ac)
 	if len(search["items"].([]any)) != 1 {
 		t.Fatal("full-text search did not find post")
 	}
@@ -159,6 +159,21 @@ func TestIntegration(t *testing.T) {
 	}
 	must("PUT", "/posts/"+post+"/repost", nil, ac)
 	must("PUT", "/posts/"+post+"/bookmark", nil, ac)
+	must("PATCH", "/users/"+bob, map[string]any{"pinnedPost": post}, bc)
+	profile := must("GET", "/auth/me", nil, bc)
+	if profile["pinnedPost"] != post || profile["totalPosts"] != float64(1) {
+		t.Fatalf("profile post fields: %v", profile)
+	}
+	projected := must("POST", "/query", q("posts", Constraint{Kind: "where", Field: "userReposts", Op: "array-contains", Value: alice}), ac)["items"].([]any)
+	if len(projected) != 1 || projected[0].(map[string]any)["id"] != post {
+		t.Fatalf("repost projection: %v", projected)
+	}
+	stats := must("POST", "/query", q("users/"+alice+"/stats"), ac)["items"].([]any)
+	ids := stats[0].(map[string]any)["posts"].([]any)
+	if len(ids) != 1 || ids[0] != post {
+		t.Fatalf("post stats: %v", stats)
+	}
+
 	reply := must("POST", "/posts", PostInput{Text: "reply", ParentID: &post}, ac)["id"].(string)
 	_ = reply
 	if status, _, _ := call("POST", "/query", q("users/"+alice+"/bookmarks"), bc); status != 403 {
@@ -182,12 +197,12 @@ func TestIntegration(t *testing.T) {
 	for i := 0; i < 3; i++ {
 		must("POST", "/posts", PostInput{Text: fmt.Sprint("page", i)}, ac)
 	}
-	page := must("POST", "/query", map[string]any{"collection": "tweets", "limit": 2}, ac)
+	page := must("POST", "/query", map[string]any{"collection": "posts", "limit": 2}, ac)
 	next := page["nextCursor"].(string)
 	if next == "" {
 		t.Fatal("missing next cursor")
 	}
-	second := must("POST", "/query", map[string]any{"collection": "tweets", "limit": 2, "cursor": next}, ac)
+	second := must("POST", "/query", map[string]any{"collection": "posts", "limit": 2, "cursor": next}, ac)
 	seen := map[string]bool{}
 	for _, p := range page["items"].([]any) {
 		seen[p.(map[string]any)["id"].(string)] = true

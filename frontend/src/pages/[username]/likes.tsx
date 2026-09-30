@@ -1,16 +1,16 @@
 import { AnimatePresence } from 'framer-motion';
 import { query, where, orderBy } from '@lib/api/query';
 import { useCollection } from '@lib/hooks/useCollection';
-import { tweetsCollection } from '@lib/api/collections';
+import { postsCollection } from '@lib/api/collections';
 import { useUser } from '@lib/context/user-context';
 import { UserLayout, ProtectedLayout } from '@components/layout/common-layout';
 import { MainLayout } from '@components/layout/main-layout';
 import { SEO } from '@components/common/seo';
 import { UserDataLayout } from '@components/layout/user-data-layout';
 import { UserHomeLayout } from '@components/layout/user-home-layout';
-import { Tweet } from '@components/tweet/tweet';
+import { Post } from '@components/post/post';
 import { Loading } from '@components/ui/loading';
-import { StatsEmpty } from '@components/tweet/stats-empty';
+import { StatsEmpty } from '@components/post/stats-empty';
 import type { ReactElement, ReactNode, JSX } from 'react';
 
 export default function UserLikes(): JSX.Element {
@@ -20,7 +20,7 @@ export default function UserLikes(): JSX.Element {
 
   const { data, loading } = useCollection(
     query(
-      tweetsCollection,
+      postsCollection,
       where('userLikes', 'array-contains', id),
       orderBy('createdAt', 'desc')
     ),
@@ -30,7 +30,7 @@ export default function UserLikes(): JSX.Element {
   return (
     <section>
       <SEO
-        title={`Tweets liked by ${name as string} (@${
+        title={`Posts liked by ${name as string} (@${
           username as string
         }) / Twitter`}
       />
@@ -38,13 +38,13 @@ export default function UserLikes(): JSX.Element {
         <Loading className='mt-5' />
       ) : !data ? (
         <StatsEmpty
-          title={`@${username as string} hasn't liked any Tweets`}
-          description='When they do, those Tweets will show up here.'
+          title={`@${username as string} hasn't liked any Posts`}
+          description='When they do, those Posts will show up here.'
         />
       ) : (
         <AnimatePresence mode='popLayout'>
-          {data.map((tweet) => (
-            <Tweet {...tweet} key={tweet.id} />
+          {data.map((post) => (
+            <Post {...post} key={post.id} />
           ))}
         </AnimatePresence>
       )}

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"flag"
@@ -25,8 +26,13 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	if !json.Valid(b) {
+		log.Fatal("invalid export JSON")
+	}
 	var data importer.Export
-	if err = json.Unmarshal(b, &data); err != nil {
+	decoder := json.NewDecoder(bytes.NewReader(b))
+	decoder.DisallowUnknownFields()
+	if err = decoder.Decode(&data); err != nil {
 		log.Fatal(err)
 	}
 	if err = data.Validate(); err != nil {
@@ -54,7 +60,7 @@ func main() {
 			log.Fatalf("missing/size mismatch: %s", m.ID)
 		}
 	}
-	fmt.Printf("Validated %d users, %d posts, %d media; apply=%t\n", len(data.Users), len(data.Tweets), len(data.Media), *apply)
+	fmt.Printf("Validated %d users, %d posts, %d media; apply=%t\n", len(data.Users), len(data.Posts), len(data.Media), *apply)
 	if !*apply {
 		return
 	}

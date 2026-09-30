@@ -4,7 +4,7 @@ import { usersCollection } from './collections';
 import type { Query } from './query';
 import type { EditableUserData } from '@lib/types/user';
 import type { FilesWithId, ImagesPreview } from '@lib/types/file';
-import type { Tweet } from '@lib/types/tweet';
+import type { Post } from '@lib/types/post';
 import type { Theme, Accent } from '@lib/types/theme';
 export async function checkUsernameAvailability(
   username: string
@@ -50,13 +50,13 @@ export async function updateUsername(
 ): Promise<void> {
   await api(`/users/${userId}`, 'PATCH', { username });
 }
-export async function managePinnedTweet(
+export async function managePinnedPost(
   type: 'pin' | 'unpin',
   userId: string,
-  tweetId: string
+  postId: string
 ): Promise<void> {
   await api(`/users/${userId}`, 'PATCH', {
-    pinnedTweet: type === 'pin' ? tweetId : null
+    pinnedPost: type === 'pin' ? postId : null
   });
 }
 export async function manageFollow(
@@ -66,25 +66,25 @@ export async function manageFollow(
 ): Promise<void> {
   await api(`/users/${target}/follow`, type === 'follow' ? 'PUT' : 'DELETE');
 }
-export async function removeTweet(id: string): Promise<void> {
+export async function removePost(id: string): Promise<void> {
   await api(`/posts/${id}`, 'DELETE');
 }
-export function manageRetweet(
-  type: 'retweet' | 'unretweet',
+export function manageRepost(
+  type: 'repost' | 'unrepost',
   _userId: string,
   id: string
 ): () => Promise<void> {
   return async () => {
-    await api(`/posts/${id}/repost`, type === 'retweet' ? 'PUT' : 'DELETE');
+    await api(`/posts/${id}/repost`, type === 'repost' ? 'PUT' : 'DELETE');
   };
 }
 export function manageLike(
   type: 'like' | 'unlike',
   _userId: string,
-  tweet: Tweet
+  post: Post
 ): () => Promise<void> {
   return async () => {
-    await api(`/posts/${tweet.id}/like`, type === 'like' ? 'PUT' : 'DELETE');
+    await api(`/posts/${post.id}/like`, type === 'like' ? 'PUT' : 'DELETE');
   };
 }
 export async function manageBookmark(

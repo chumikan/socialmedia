@@ -2,7 +2,7 @@ import type { Timestamp, DocumentConverter } from '@lib/api/query';
 
 export type Stats = {
   likes: string[];
-  tweets: string[];
+  posts: string[];
   updatedAt: Timestamp | null;
 };
 

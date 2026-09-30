@@ -4,7 +4,7 @@ The importer never calls Firebase, Google Cloud or external image URLs. It reads
 
 ## Input
 
-See `docs/fixtures/firebase-export.json` for a complete small example. Top-level arrays are `users`, `tweets`, `notifications`, `authUsers`, `media`; `bookmarks` maps user IDs to bookmark arrays. Each Firestore document must include its document ID as `id`. Preserve original field names and UID references. `createdAt` accepts RFC3339 or `{seconds,nanoseconds}` / `{_seconds,_nanoseconds}`. Embedded `images` reference media manifest IDs.
+See `docs/fixtures/firebase-export.json` for a complete small example. Top-level arrays are `users`, `posts`, `notifications`, `authUsers`, `media`; `bookmarks` maps user IDs to bookmark arrays. Each Firestore document must include its document ID as `id`. Use the current document field names (`pinnedPost`, `userReposts`) and preserve UID references. Normalize older export field names to this schema before importing. `createdAt` accepts RFC3339 or `{seconds,nanoseconds}` / `{_seconds,_nanoseconds}`. Embedded `images` reference media manifest IDs.
 
 Firebase Auth JSON exports can supply `authUsers` entries with `localId`, `email`, and `providerUserInfo`. Google `rawId` is imported into oauth_identities. Password hashes and administrator privileges are deliberately not imported: Firebase scrypt hashes are not bcrypt hashes. Stats and trends are rebuilt from posts/relationships. `following` is the canonical source for follows; reconcile inconsistent old follower arrays before import.
 
@@ -43,4 +43,4 @@ go run ./cmd/user -email user@example.com -password-stdin < /path/to/protected-p
 
 This changes the bcrypt hash and revokes prior sessions. Google accounts with imported provider IDs can use configured Google OIDC. Users missing exported email addresses receive a non-deliverable `<UID>@import.invalid` address and need operator reconciliation.
 
-Supported notification types are `follower`, `liked`, `reply`, and `repost`. Remove obsolete notification types from legacy exports before importing; unsupported types fail validation. Unknown top-level JSON fields are ignored and are not imported.
+Supported notification types are `follower`, `liked`, `reply`, and `repost`. Remove obsolete notification types from legacy exports before importing; unsupported types fail validation. Unknown top-level JSON fields are rejected by the CLI to avoid silently omitting data from outdated export formats.

@@ -31,7 +31,7 @@ func TestOfflineValidation(t *testing.T) {
 	if v.Users[0].Time("createdAt").Unix() != 1700000000 {
 		t.Fatal("legacy timestamp conversion")
 	}
-	v.Tweets[0]["images"] = json.RawMessage(`[{"id":"missing"}]`)
+	v.Posts[0]["images"] = json.RawMessage(`[{"id":"missing"}]`)
 	if v.Validate() == nil {
 		t.Fatal("missing media silently accepted")
 	}

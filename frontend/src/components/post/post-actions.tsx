@@ -7,8 +7,8 @@ import { toast } from 'react-hot-toast';
 import { doc, getDoc } from '@lib/api/query';
 import { useAuth } from '@lib/context/auth-context';
 import { useModal } from '@lib/hooks/useModal';
-import { tweetsCollection } from '@lib/api/collections';
-import { removeTweet, manageFollow, managePinnedTweet } from '@lib/api/utils';
+import { postsCollection } from '@lib/api/collections';
+import { removePost, manageFollow, managePinnedPost } from '@lib/api/utils';
 import { delayScroll, preventBubbling, sleep } from '@lib/utils';
 import { Modal } from '@components/modal/modal';
 import { ActionModal } from '@components/modal/action-modal';
@@ -17,7 +17,7 @@ import { ToolTip } from '@components/ui/tooltip';
 import { HeroIcon } from '@components/ui/hero-icon';
 import { CustomIcon } from '@components/ui/custom-icon';
 import type { Variants } from 'framer-motion';
-import type { Tweet } from '@lib/types/tweet';
+import type { Post } from '@lib/types/post';
 import type { User } from '@lib/types/user';
 
 export const variants: Variants = {
@@ -30,43 +30,43 @@ export const variants: Variants = {
   exit: { opacity: 0, y: -25, transition: { duration: 0.2 } }
 };
 
-type TweetActionsProps = Pick<Tweet, 'createdBy'> & {
+type PostActionsProps = Pick<Post, 'createdBy'> & {
   isOwner: boolean;
   ownerId: string;
-  tweetId: string;
+  postId: string;
   username: string;
   parentId?: string;
   parentUsername: string;
   hasImages: boolean;
-  viewTweet?: boolean;
+  viewPost?: boolean;
 };
 
 type PinModalData = Record<'title' | 'description' | 'mainBtnLabel', string>;
 
 const pinModalData: Readonly<PinModalData[]> = [
   {
-    title: 'Pin Tweet to from profile?',
+    title: 'Pin Post to from profile?',
     description:
-      'This will appear at the top of your profile and replace any previously pinned Tweet.',
+      'This will appear at the top of your profile and replace any previously pinned Post.',
     mainBtnLabel: 'Pin'
   },
   {
-    title: 'Unpin Tweet from profile?',
+    title: 'Unpin Post from profile?',
     description:
       'This will no longer appear automatically at the top of your profile.',
     mainBtnLabel: 'Unpin'
   }
 ];
 
-export function TweetActions({
+export function PostActions({
   isOwner,
-  tweetId,
+  postId,
   parentId,
   parentUsername,
   username,
-  viewTweet,
+  viewPost,
   createdBy
-}: TweetActionsProps): JSX.Element {
+}: PostActionsProps): JSX.Element {
   const { user, isAdmin } = useAuth();
   const { push } = useRouter();
 
@@ -82,15 +82,15 @@ export function TweetActions({
     closeModal: pinCloseModal
   } = useModal();
 
-  const { id: userId, following, pinnedTweet } = user as User;
+  const { id: userId, following, pinnedPost } = user as User;
 
   const isInAdminControl = isAdmin && !isOwner;
-  const tweetIsPinned = pinnedTweet === tweetId;
+  const postIsPinned = pinnedPost === postId;
 
   const handleRemove = async (): Promise<void> => {
-    if (viewTweet)
+    if (viewPost)
       if (parentId) {
-        const parentSnapshot = await getDoc(doc(tweetsCollection, parentId));
+        const parentSnapshot = await getDoc(doc(postsCollection, parentId));
         if (parentSnapshot.exists()) {
           await push(`/@${parentUsername}/status/${parentId}`, undefined, {
             scroll: false
@@ -100,20 +100,20 @@ export function TweetActions({
         } else await push('/home');
       } else await push('/home');
 
-    await removeTweet(tweetId);
+    await removePost(postId);
 
     toast.success(
-      `${isInAdminControl ? `@${username}'s` : 'Your'} Tweet was deleted`
+      `${isInAdminControl ? `@${username}'s` : 'Your'} Post was deleted`
     );
 
     removeCloseModal();
   };
 
   const handlePin = async (): Promise<void> => {
-    await managePinnedTweet(tweetIsPinned ? 'unpin' : 'pin', userId, tweetId);
+    await managePinnedPost(postIsPinned ? 'unpin' : 'pin', userId, postId);
     toast.success(
-      `Your Tweet was ${
-        tweetIsPinned ? 'unpinned from' : 'pinned to'
+      `Your Post was ${
+        postIsPinned ? 'unpinned from' : 'pinned to'
       } your profile`
     );
     pinCloseModal();
@@ -135,7 +135,7 @@ export function TweetActions({
   const userIsFollowed = following.includes(createdBy);
 
   const currentPinModalData = useMemo(
-    () => pinModalData[+tweetIsPinned],
+    () => pinModalData[+postIsPinned],
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [pinOpen]
   );
@@ -148,7 +148,7 @@ export function TweetActions({
         closeModal={removeCloseModal}
       >
         <ActionModal
-          title='Delete Tweet?'
+          title='Delete Post?'
           description={`This can’t be undone and it will be removed from ${
             isInAdminControl ? `@${username}'s` : 'your'
           } profile, the timeline of any accounts that follow ${
@@ -223,7 +223,7 @@ export function TweetActions({
                       as={Button}
                       onClick={preventBubbling(pinOpenModal)}
                     >
-                      {tweetIsPinned ? (
+                      {postIsPinned ? (
                         <>
                           <CustomIcon iconName='PinOffIcon' />
                           Unpin from profile

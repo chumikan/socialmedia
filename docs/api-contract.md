@@ -23,7 +23,7 @@ Errors: `{error:string}` with 400 validation, 401 missing/expired/revoked sessio
 | PUT / DELETE /posts/{id}/bookmark | none | Current user; private relation. |
 | DELETE /bookmarks | none | Clears current user's bookmarks. |
 | PUT / DELETE /users/{id}/follow | none | Current user; self-follow and banned targets rejected. |
-| PATCH /users/{id} | Subset of `name,bio,website,location,username,photoURL,coverPhotoURL,theme,accent,pinnedTweet` | Owner or admin. No role/verified/BAN fields. Pin must belong to profile owner. Media must be owned by actor. |
+| PATCH /users/{id} | Subset of `name,bio,website,location,username,photoURL,coverPhotoURL,theme,accent,pinnedPost` | Owner or admin. No role/verified/BAN fields. Pin must belong to profile owner. Media must be owned by actor. |
 | PUT /users/{id}/ban | `{banned:boolean,reason:string}` | Admin only, cannot target self or another admin. Audit row; session version increments. |
 | PATCH /notifications/{id} | `{isChecked:boolean}` | Recipient only. |
 | POST /media | multipart `file` | Authenticated, non-banned; 1 byte–50 MiB; content sniffed JPEG/PNG/GIF/WebP/MP4/WebM/QuickTime. Stores metadata in PostgreSQL, bytes in private S3. Returns MediaDTO. |
@@ -40,7 +40,7 @@ Errors: `{error:string}` with 400 validation, 401 missing/expired/revoked sessio
 
 Returns `{items: DTO[],nextCursor:string}`. Maximum page size 100, default 50. A nonempty nextCursor is passed verbatim for the next page with the same collection and constraints. Keyset pagination uses ordered values plus a stable ID tie-breaker; insertion at the head does not shift later pages. Ordering by mutable values (e.g. user updatedAt) is not a transaction snapshot. The client deduplicates IDs. `{count:true}` returns `{count:number}`.
 
-Allowed collections: `users`, `tweets`, `feed`, `trends`, `notifications`, `users/{id}/bookmarks`, `users/{id}/stats`. Each has a field allowlist in query.go; no SQL, table names or writes are accepted. Filters: `==`, `!=`, comparisons, `array-contains`; order: asc/desc; start/end bounds for username prefix search. `where text search` uses PostgreSQL simple full-text search with a GIN index. Japanese morphological tokenization is not included.
+Allowed collections: `users`, `posts`, `feed`, `trends`, `notifications`, `users/{id}/bookmarks`, `users/{id}/stats`. Each has a field allowlist in query.go; no SQL, table names or writes are accepted. Filters: `==`, `!=`, comparisons, `array-contains`; order: asc/desc; start/end bounds for username prefix search. `where text search` uses PostgreSQL simple full-text search with a GIN index. Japanese morphological tokenization is not included.
 
 Feed = own/followed users' posts plus posts reposted by followed users, newest original post first; one entry per post. Client can exclude replies. Banned authors' posts are always excluded. Follow/like/repost arrays are compatibility projections over normalized relationship tables, not authoritative client-writable arrays.
 
@@ -57,7 +57,7 @@ cd backend
 go run ./cmd/contracts > ../frontend/src/lib/api/contracts.ts
 ```
 
-User and tweet UI types derive from generated DTOs, replacing only transport date/media presentation fields. CI compares generated output byte-for-byte. Integration tests exercise SQL projections and serialized field types. Breaking changes require a new API version or a coordinated DTO regeneration.
+User and post UI types derive from generated DTOs, replacing only transport date/media presentation fields. CI compares generated output byte-for-byte. Integration tests exercise SQL projections and serialized field types. Breaking changes require a new API version or a coordinated DTO regeneration.
 
 ## Extension boundary
 

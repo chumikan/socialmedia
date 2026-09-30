@@ -1,18 +1,18 @@
 import { functions, firestore, regionalFunctions } from './lib/utils';
-import { tweetConverter, bookmarkConverter } from './types';
-import type { Tweet } from './types';
+import { postConverter, bookmarkConverter } from './types';
+import type { Post } from './types';
 
 export const normalizeStats = regionalFunctions.firestore
-  .document('tweets/{tweetId}')
+  .document('posts/{postId}')
   .onDelete(async (snapshot): Promise<void> => {
-    const tweetId = snapshot.id;
-    const tweetData = snapshot.data() as Tweet;
+    const postId = snapshot.id;
+    const postData = snapshot.data() as Post;
 
-    functions.logger.info(`Normalizing stats from tweet ${tweetId}`);
+    functions.logger.info(`Normalizing stats from post ${postId}`);
 
-    const { userRetweets, userLikes } = tweetData;
+    const { userReposts, userLikes } = postData;
 
-    const usersStatsToDelete = new Set([...userRetweets, ...userLikes]);
+    const usersStatsToDelete = new Set([...userReposts, ...userLikes]);
 
     const batch = firestore().batch();
 
@@ -21,17 +21,17 @@ export const normalizeStats = regionalFunctions.firestore
 
       const userStatsRef = firestore()
         .doc(`users/${userId}/stats/stats`)
-        .withConverter(tweetConverter);
+        .withConverter(postConverter);
 
       batch.update(userStatsRef, {
-        tweets: firestore.FieldValue.arrayRemove(tweetId),
-        likes: firestore.FieldValue.arrayRemove(tweetId)
+        posts: firestore.FieldValue.arrayRemove(postId),
+        likes: firestore.FieldValue.arrayRemove(postId)
       });
     });
 
     const bookmarksQuery = firestore()
       .collectionGroup('bookmarks')
-      .where('id', '==', tweetId)
+      .where('id', '==', postId)
       .withConverter(bookmarkConverter);
 
     const docsSnap = await bookmarksQuery.get();
@@ -45,5 +45,5 @@ export const normalizeStats = regionalFunctions.firestore
 
     await batch.commit();
 
-    functions.logger.info(`Normalizing stats for tweet ${tweetId} is done`);
+    functions.logger.info(`Normalizing stats for post ${postId} is done`);
   });

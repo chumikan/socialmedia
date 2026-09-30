@@ -20,12 +20,12 @@ const UNITS: Units = {
 
 export function formatDate(
   targetDate: Timestamp,
-  mode: 'tweet' | 'full' | 'joined'
+  mode: 'post' | 'full' | 'joined'
 ): string {
   const date = targetDate.toDate();
 
   if (mode === 'full') return getFullTime(date);
-  if (mode === 'tweet') return getPostTime(date);
+  if (mode === 'post') return getCompactPostTime(date);
   return getJoinedTime(date);
 }
 
@@ -36,7 +36,7 @@ export function formatNumber(number: number): string {
   }).format(number);
 }
 
-export function getTweetTime(targetDate: Timestamp): string {
+export function getPostTime(targetDate: Timestamp): string {
   const date = targetDate.toDate();
 
   const dateFormatter = new Intl.DateTimeFormat(LOCALE, {
@@ -78,7 +78,7 @@ function getFullTime(date: Date): string {
   return formattedDate;
 }
 
-function getPostTime(date: Date): string {
+function getCompactPostTime(date: Date): string {
   if (isToday(date)) return getRelativeTime(date);
   if (isYesterday(date))
     return new Intl.DateTimeFormat(LOCALE, {

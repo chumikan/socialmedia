@@ -5,48 +5,48 @@ import { twemojiParseWithLinks } from '@lib/twemoji';
 import { useAuth } from '@lib/context/auth-context';
 import { useModal } from '@lib/hooks/useModal';
 import { Modal } from '@components/modal/modal';
-import { TweetReplyModal } from '@components/modal/tweet-reply-modal';
+import { PostReplyModal } from '@components/modal/post-reply-modal';
 import { ImagePreview } from '@components/input/image-preview';
 import { UserAvatar } from '@components/user/user-avatar';
 import { UserTooltip } from '@components/user/user-tooltip';
 import { UserName } from '@components/user/user-name';
 import { UserUsername } from '@components/user/user-username';
-import { variants } from '@components/tweet/tweet';
-import { TweetActions } from '@components/tweet/tweet-actions';
-import { TweetStats } from '@components/tweet/tweet-stats';
-import { TweetDate } from '@components/tweet/tweet-date';
+import { variants } from '@components/post/post';
+import { PostActions } from '@components/post/post-actions';
+import { PostStats } from '@components/post/post-stats';
+import { PostDate } from '@components/post/post-date';
 import { Input } from '@components/input/input';
 import type { RefObject, JSX } from 'react';
 import type { User } from '@lib/types/user';
-import type { Tweet } from '@lib/types/tweet';
+import type { Post } from '@lib/types/post';
 
-type ViewTweetProps = Tweet & {
+type ViewPostProps = Post & {
   user: User;
-  viewTweetRef?: RefObject<HTMLElement | null>;
+  viewPostRef?: RefObject<HTMLElement | null>;
 };
 
-export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
+export function ViewPost(post: ViewPostProps): JSX.Element {
   const {
-    id: tweetId,
+    id: postId,
     text,
     images,
     parent,
     userLikes,
     createdBy,
     createdAt,
-    userRetweets,
+    userReposts,
     userReplies,
-    viewTweetRef,
-    user: tweetUserData
-  } = tweet;
+    viewPostRef,
+    user: postUserData
+  } = post;
 
-  const { id: ownerId, name, username, verified, photoURL } = tweetUserData;
+  const { id: ownerId, name, username, verified, photoURL } = postUserData;
 
   const { user } = useAuth();
 
   const { open, openModal, closeModal } = useModal();
 
-  const tweetLink = `/@${username}/status/${tweetId}`;
+  const postLink = `/@${username}/status/${postId}`;
 
   const userId = user?.id as string;
 
@@ -66,7 +66,7 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
       {...variants}
       animate={{ ...variants.animate, transition: { duration: 0.2 } }}
       exit={undefined}
-      ref={viewTweetRef}
+      ref={viewPostRef}
     >
       <Modal
         className='flex items-start justify-center'
@@ -74,7 +74,7 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
         open={open}
         closeModal={closeModal}
       >
-        <TweetReplyModal tweet={tweet} closeModal={closeModal} />
+        <PostReplyModal post={post} closeModal={closeModal} />
       </Modal>
       <div className='flex flex-col gap-2'>
         {reply && (
@@ -83,7 +83,7 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
           </div>
         )}
         <div className='grid grid-cols-[auto,1fr] gap-3'>
-          <UserTooltip avatar {...tweetUserData}>
+          <UserTooltip avatar {...postUserData}>
             <UserAvatar
               src={photoURL}
               alt={name ?? username}
@@ -92,7 +92,7 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
           </UserTooltip>
           <div className='flex min-w-0 justify-between'>
             <div className='flex flex-col truncate xs:overflow-visible xs:whitespace-normal'>
-              <UserTooltip {...tweetUserData}>
+              <UserTooltip {...postUserData}>
                 <UserName
                   className='-mb-1'
                   name={name ?? username}
@@ -100,16 +100,16 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
                   verified={verified}
                 />
               </UserTooltip>
-              <UserTooltip {...tweetUserData}>
+              <UserTooltip {...postUserData}>
                 <UserUsername username={username} />
               </UserTooltip>
             </div>
             <div className='px-4'>
-              <TweetActions
-                viewTweet
+              <PostActions
+                viewPost
                 isOwner={isOwner}
                 ownerId={ownerId}
-                tweetId={tweetId}
+                postId={postId}
                 parentId={parentId}
                 parentUsername={parentUsername}
                 username={username}
@@ -145,7 +145,7 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
         )}
         {images && (
           <ImagePreview
-            viewTweet
+            viewPost
             imagesPreview={images}
             previewCount={images.length}
           />
@@ -154,22 +154,22 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
           className='inner:hover-animation inner:border-b inner:border-light-border
                      dark:inner:border-dark-border'
         >
-          <TweetDate viewTweet tweetLink={tweetLink} createdAt={createdAt} />
-          <TweetStats
-            viewTweet
+          <PostDate viewPost postLink={postLink} createdAt={createdAt} />
+          <PostStats
+            viewPost
             reply={reply}
             userId={userId}
             isOwner={isOwner}
-            tweetId={tweetId}
-            tweetCreatedBy={createdBy}
+            postId={postId}
+            postCreatedBy={createdBy}
             username={username}
             userLikes={userLikes}
-            userRetweets={userRetweets}
+            userReposts={userReposts}
             userReplies={userReplies}
             openModal={openModal}
           />
         </div>
-        <Input reply parent={{ id: tweetId, username: username }} />
+        <Input reply parent={{ id: postId, username: username }} />
       </div>
     </motion.article>
   );

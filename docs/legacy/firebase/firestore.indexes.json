@@ -15,7 +15,7 @@
       ]
     },
     {
-      "collectionGroup": "tweets",
+      "collectionGroup": "posts",
       "queryScope": "COLLECTION",
       "fields": [
         {
@@ -29,7 +29,7 @@
       ]
     },
     {
-      "collectionGroup": "tweets",
+      "collectionGroup": "posts",
       "queryScope": "COLLECTION",
       "fields": [
         {
@@ -43,7 +43,7 @@
       ]
     },
     {
-      "collectionGroup": "tweets",
+      "collectionGroup": "posts",
       "queryScope": "COLLECTION",
       "fields": [
         {
@@ -57,7 +57,7 @@
       ]
     },
     {
-      "collectionGroup": "tweets",
+      "collectionGroup": "posts",
       "queryScope": "COLLECTION",
       "fields": [
         {
@@ -71,7 +71,7 @@
       ]
     },
     {
-      "collectionGroup": "tweets",
+      "collectionGroup": "posts",
       "queryScope": "COLLECTION",
       "fields": [
         {
@@ -85,11 +85,11 @@
       ]
     },
     {
-      "collectionGroup": "tweets",
+      "collectionGroup": "posts",
       "queryScope": "COLLECTION",
       "fields": [
         {
-          "fieldPath": "userRetweets",
+          "fieldPath": "userReposts",
           "arrayConfig": "CONTAINS"
         },
         {

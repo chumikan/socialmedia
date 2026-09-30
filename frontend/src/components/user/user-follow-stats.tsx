@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, type JSX } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { getProfileUsername } from '@lib/profile-route';
-import { NumberStats } from '@components/tweet/number-stats';
+import { NumberStats } from '@components/post/number-stats';
 import type { User } from '@lib/types/user';
 
 type UserFollowStatsProps = Pick<User, 'following' | 'followers'>;

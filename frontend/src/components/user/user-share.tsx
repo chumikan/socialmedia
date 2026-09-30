@@ -7,7 +7,7 @@ import { siteURL } from '@lib/env';
 import { Button } from '@components/ui/button';
 import { HeroIcon } from '@components/ui/hero-icon';
 import { ToolTip } from '@components/ui/tooltip';
-import { variants } from '@components/tweet/tweet-actions';
+import { variants } from '@components/post/post-actions';
 
 import type { JSX } from 'react';
 

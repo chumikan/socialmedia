@@ -13,12 +13,12 @@ export type UserDTO = {
   verified: boolean;
   isAdmin: boolean;
   isBanned: boolean;
-  pinnedTweet: string | null;
+  pinnedPost: string | null;
   createdAt: string;
   updatedAt: string | null;
   following: Array<string>;
   followers: Array<string>;
-  totalTweets: number;
+  totalPosts: number;
   totalPhotos: number;
 };
 export type MediaDTO = {
@@ -31,7 +31,7 @@ export type ParentDTO = {
   id: string;
   username: string;
 };
-export type TweetDTO = {
+export type PostDTO = {
   id: string;
   text: string | null;
   images: Array<MediaDTO> | null;
@@ -40,7 +40,7 @@ export type TweetDTO = {
   createdAt: string;
   updatedAt: string | null;
   userLikes: Array<string>;
-  userRetweets: Array<string>;
+  userReposts: Array<string>;
   userReplies: number;
 };
 export type LoginInput = {

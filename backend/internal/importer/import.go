@@ -54,7 +54,7 @@ type Media struct {
 }
 type Export struct {
 	Users         []Document            `json:"users"`
-	Tweets        []Document            `json:"tweets"`
+	Posts         []Document            `json:"posts"`
 	Notifications []Document            `json:"notifications"`
 	Bookmarks     map[string][]Document `json:"bookmarks"`
 	Media         []Media               `json:"media"`
@@ -92,17 +92,17 @@ func (e Export) Validate() error {
 		}
 		media[m.ID] = true
 	}
-	for _, p := range e.Tweets {
+	for _, p := range e.Posts {
 		pid := p.String("id")
 		if pid == "" || posts[pid] || !seen[p.String("createdBy")] || p.Time("createdAt").IsZero() {
-			return fmt.Errorf("invalid tweet %s", pid)
+			return fmt.Errorf("invalid post %s", pid)
 		}
 		posts[pid] = true
 		var images []Document
 		_ = json.Unmarshal(p["images"], &images)
 		for _, img := range images {
 			if !media[img.String("id")] {
-				return fmt.Errorf("tweet %s media %s missing manifest", pid, img.String("id"))
+				return fmt.Errorf("post %s media %s missing manifest", pid, img.String("id"))
 			}
 		}
 	}
@@ -165,12 +165,12 @@ func (e Export) Apply(ctx context.Context, db *pgxpool.Pool) error {
 			return err
 		}
 	}
-	for _, p := range e.Tweets {
+	for _, p := range e.Posts {
 		if err = exec("INSERT INTO posts(id,author_id,text,created_at) VALUES($1,$2,$3,$4) ON CONFLICT(id) DO NOTHING", p.String("id"), p.String("createdBy"), null(p.String("text")), p.Time("createdAt")); err != nil {
 			return err
 		}
 	}
-	for _, p := range e.Tweets {
+	for _, p := range e.Posts {
 		pid := p.String("id")
 		var parent Document
 		_ = json.Unmarshal(p["parent"], &parent)
@@ -179,7 +179,7 @@ func (e Export) Apply(ctx context.Context, db *pgxpool.Pool) error {
 				return err
 			}
 		}
-		for _, rel := range []struct{ field, table string }{{"userLikes", "likes"}, {"userRetweets", "reposts"}} {
+		for _, rel := range []struct{ field, table string }{{"userLikes", "likes"}, {"userReposts", "reposts"}} {
 			for _, uid := range p.Strings(rel.field) {
 				if err = exec("INSERT INTO "+rel.table+"(user_id,post_id) VALUES($1,$2) ON CONFLICT DO NOTHING", uid, pid); err != nil {
 					return err
@@ -200,7 +200,7 @@ func (e Export) Apply(ctx context.Context, db *pgxpool.Pool) error {
 				return err
 			}
 		}
-		if pin := u.String("pinnedTweet"); pin != "" {
+		if pin := u.String("pinnedPost"); pin != "" {
 			if err = exec("UPDATE users SET pinned_post_id=$1 WHERE id=$2 AND pinned_post_id IS NULL", pin, u.String("id")); err != nil {
 				return err
 			}

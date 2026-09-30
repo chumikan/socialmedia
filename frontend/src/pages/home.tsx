@@ -9,16 +9,16 @@ import { MainContainer } from '@components/home/main-container';
 import { Input } from '@components/input/input';
 import { UpdateUsername } from '@components/home/update-username';
 import { MainHeader } from '@components/home/main-header';
-import { Tweet } from '@components/tweet/tweet';
+import { Post } from '@components/post/post';
 import { Loading } from '@components/ui/loading';
-import type { Tweet as TweetData } from '@lib/types/tweet';
+import type { Post as PostData } from '@lib/types/post';
 import type { ReactElement, ReactNode, JSX } from 'react';
 
 export default function Home(): JSX.Element {
   const { isMobile } = useWindow();
 
   const { data, loading, LoadMore } = useInfiniteScroll(
-    collection<TweetData>('feed'),
+    collection<PostData>('feed'),
     [where('parent', '==', null), orderBy('createdAt', 'desc')],
     { includeUser: true, allowNull: true, preserve: true }
   );
@@ -45,9 +45,9 @@ export default function Home(): JSX.Element {
           <>
             <AnimatePresence mode='popLayout'>
               {data
-                .filter((tweet) => !tweet.user?.isBanned)
-                .map((tweet) => (
-                  <Tweet {...tweet} key={tweet.id} />
+                .filter((post) => !post.user?.isBanned)
+                .map((post) => (
+                  <Post {...post} key={post.id} />
                 ))}
             </AnimatePresence>
             <LoadMore />

@@ -27,7 +27,7 @@ func (a *App) updateUser(w http.ResponseWriter, r *http.Request) error {
 	if err := decode(w, r, &in); err != nil {
 		return err
 	}
-	columns := map[string]string{"name": "name", "bio": "bio", "website": "website", "location": "location", "username": "username", "photoURL": "photo_url", "coverPhotoURL": "cover_photo_url", "theme": "theme", "accent": "accent", "pinnedTweet": "pinned_post_id"}
+	columns := map[string]string{"name": "name", "bio": "bio", "website": "website", "location": "location", "username": "username", "photoURL": "photo_url", "coverPhotoURL": "cover_photo_url", "theme": "theme", "accent": "accent", "pinnedPost": "pinned_post_id"}
 	err := a.transaction(r, func(tx pgx.Tx, uid string) error {
 		target := r.PathValue("id")
 		var admin bool
@@ -90,7 +90,7 @@ func (a *App) updateUser(w http.ResponseWriter, r *http.Request) error {
 						return bad("invalid profile image")
 					}
 				}
-			case "pinnedTweet":
+			case "pinnedPost":
 				if v != "" {
 					var exists bool
 					if err := tx.QueryRow(r.Context(), "SELECT EXISTS(SELECT 1 FROM posts WHERE id=$1 AND author_id=$2)", v, target).Scan(&exists); err != nil {

@@ -3,69 +3,69 @@ import { doc, query, where } from '@lib/api/query';
 import { useUser } from '@lib/context/user-context';
 import { useCollection } from '@lib/hooks/useCollection';
 import { useDocument } from '@lib/hooks/useDocument';
-import { tweetsCollection } from '@lib/api/collections';
+import { postsCollection } from '@lib/api/collections';
 import { mergeData } from '@lib/merge';
 import { UserLayout, ProtectedLayout } from '@components/layout/common-layout';
 import { MainLayout } from '@components/layout/main-layout';
 import { UserDataLayout } from '@components/layout/user-data-layout';
 import { UserHomeLayout } from '@components/layout/user-home-layout';
-import { StatsEmpty } from '@components/tweet/stats-empty';
+import { StatsEmpty } from '@components/post/stats-empty';
 import { Loading } from '@components/ui/loading';
-import { Tweet } from '@components/tweet/tweet';
+import { Post } from '@components/post/post';
 import type { ReactElement, ReactNode, JSX } from 'react';
 
-export default function UserTweets(): JSX.Element {
+export default function UserPosts(): JSX.Element {
   const { user } = useUser();
 
-  const { id, username, pinnedTweet } = user ?? {};
+  const { id, username, pinnedPost } = user ?? {};
 
   const { data: pinnedData } = useDocument(
-    doc(tweetsCollection, pinnedTweet ?? 'null'),
+    doc(postsCollection, pinnedPost ?? 'null'),
     {
-      disabled: !pinnedTweet,
+      disabled: !pinnedPost,
       allowNull: true,
       includeUser: true
     }
   );
 
-  const { data: ownerTweets, loading: ownerLoading } = useCollection(
+  const { data: ownerPosts, loading: ownerLoading } = useCollection(
     query(
-      tweetsCollection,
+      postsCollection,
       where('createdBy', '==', id),
       where('parent', '==', null)
     ),
     { includeUser: true, allowNull: true }
   );
 
-  const { data: peopleTweets, loading: peopleLoading } = useCollection(
+  const { data: peoplePosts, loading: peopleLoading } = useCollection(
     query(
-      tweetsCollection,
+      postsCollection,
       where('createdBy', '!=', id),
-      where('userRetweets', 'array-contains', id)
+      where('userReposts', 'array-contains', id)
     ),
     { includeUser: true, allowNull: true }
   );
 
-  const mergedTweets = mergeData(true, ownerTweets, peopleTweets);
+  const mergedPosts = mergeData(true, ownerPosts, peoplePosts);
 
   return (
     <section>
       {ownerLoading || peopleLoading ? (
         <Loading className='mt-5' />
-      ) : !mergedTweets ? (
+      ) : !mergedPosts ? (
         <StatsEmpty
-          title={`@${username as string} hasn't tweeted`}
-          description='When they do, their Tweets will show up here.'
+          title={`@${username as string} hasn't posted`}
+          description='When they do, their Posts will show up here.'
         />
       ) : (
         <AnimatePresence mode='popLayout'>
           {pinnedData && (
-            <Tweet pinned {...pinnedData} key={`pinned-${pinnedData.id}`} />
+            <Post pinned {...pinnedData} key={`pinned-${pinnedData.id}`} />
           )}
-          {mergedTweets
-            .filter((tweet) => !pinnedData || tweet.id !== pinnedData.id)
-            .map((tweet) => (
-              <Tweet {...tweet} profile={user} key={tweet.id} />
+          {mergedPosts
+            .filter((post) => !pinnedData || post.id !== pinnedData.id)
+            .map((post) => (
+              <Post {...post} profile={user} key={post.id} />
             ))}
         </AnimatePresence>
       )}
@@ -73,7 +73,7 @@ export default function UserTweets(): JSX.Element {
   );
 }
 
-UserTweets.getLayout = (page: ReactElement<unknown>): ReactNode => (
+UserPosts.getLayout = (page: ReactElement<unknown>): ReactNode => (
   <ProtectedLayout>
     <MainLayout>
       <UserLayout>

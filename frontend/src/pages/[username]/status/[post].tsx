@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import { useRouter } from 'next/router';
 import { AnimatePresence } from 'framer-motion';
 import { doc, query, where, orderBy } from '@lib/api/query';
-import { tweetsCollection } from '@lib/api/collections';
+import { postsCollection } from '@lib/api/collections';
 import { useCollection } from '@lib/hooks/useCollection';
 import { useDocument } from '@lib/hooks/useDocument';
 import { isPlural } from '@lib/utils';
@@ -10,43 +10,43 @@ import { HomeLayout, ProtectedLayout } from '@components/layout/common-layout';
 import { MainLayout } from '@components/layout/main-layout';
 import { MainContainer } from '@components/home/main-container';
 import { MainHeader } from '@components/home/main-header';
-import { Tweet } from '@components/tweet/tweet';
-import { ViewTweet } from '@components/view/view-tweet';
+import { Post } from '@components/post/post';
+import { ViewPost } from '@components/view/view-post';
 import { SEO } from '@components/common/seo';
 import { Loading } from '@components/ui/loading';
 import { Error } from '@components/ui/error';
-import { ViewParentTweet } from '@components/view/view-parent-tweet';
+import { ViewParentPost } from '@components/view/view-parent-post';
 import type { JSX, ReactElement, ReactNode } from 'react';
 
-export default function TweetId(): JSX.Element {
+export default function PostId(): JSX.Element {
   const {
-    query: { tweet },
+    query: { post },
     back
   } = useRouter();
 
-  const { data: tweetData, loading: tweetLoading } = useDocument(
-    doc(tweetsCollection, tweet as string),
+  const { data: postData, loading: postLoading } = useDocument(
+    doc(postsCollection, post as string),
     { includeUser: true, allowNull: true }
   );
 
-  const viewTweetRef = useRef<HTMLElement>(null);
+  const viewPostRef = useRef<HTMLElement>(null);
 
   const { data: repliesData, loading: repliesLoading } = useCollection(
     query(
-      tweetsCollection,
-      where('parent.id', '==', tweet),
+      postsCollection,
+      where('parent.id', '==', post),
       orderBy('createdAt', 'desc')
     ),
     { includeUser: true, allowNull: true }
   );
 
-  const { text, images } = tweetData ?? {};
+  const { text, images } = postData ?? {};
 
   const imagesLength = images?.length ?? 0;
-  const parentId = tweetData?.parent?.id;
+  const parentId = postData?.parent?.id;
 
-  const pageTitle = tweetData
-    ? `${tweetData.user.name ?? tweetData.user.username} on Twitter: "${
+  const pageTitle = postData
+    ? `${postData.user.name ?? postData.user.username} on Twitter: "${
         text ?? ''
       }${
         images ? ` (${imagesLength} image${isPlural(imagesLength)})` : ''
@@ -57,34 +57,31 @@ export default function TweetId(): JSX.Element {
     <MainContainer className='!pb-[1280px]'>
       <MainHeader
         useActionButton
-        title={parentId ? 'Thread' : 'Tweet'}
+        title={parentId ? 'Thread' : 'Post'}
         action={back}
       />
       <section>
-        {tweetLoading ? (
+        {postLoading ? (
           <Loading className='mt-5' />
-        ) : !tweetData ? (
+        ) : !postData ? (
           <>
-            <SEO title='Tweet not found / Twitter' />
-            <Error message='Tweet not found' />
+            <SEO title='Post not found / Twitter' />
+            <Error message='Post not found' />
           </>
         ) : (
           <>
             {pageTitle && <SEO title={pageTitle} />}
             {parentId && (
-              <ViewParentTweet
-                parentId={parentId}
-                viewTweetRef={viewTweetRef}
-              />
+              <ViewParentPost parentId={parentId} viewPostRef={viewPostRef} />
             )}
-            <ViewTweet viewTweetRef={viewTweetRef} {...tweetData} />
-            {tweetData &&
+            <ViewPost viewPostRef={viewPostRef} {...postData} />
+            {postData &&
               (repliesLoading ? (
                 <Loading className='mt-5' />
               ) : (
                 <AnimatePresence mode='popLayout'>
-                  {repliesData?.map((tweet) => (
-                    <Tweet {...tweet} key={tweet.id} />
+                  {repliesData?.map((post) => (
+                    <Post {...post} key={post.id} />
                   ))}
                 </AnimatePresence>
               ))}
@@ -95,7 +92,7 @@ export default function TweetId(): JSX.Element {
   );
 }
 
-TweetId.getLayout = (page: ReactElement<unknown>): ReactNode => (
+PostId.getLayout = (page: ReactElement<unknown>): ReactNode => (
   <ProtectedLayout>
     <MainLayout>
       <HomeLayout>{page}</HomeLayout>

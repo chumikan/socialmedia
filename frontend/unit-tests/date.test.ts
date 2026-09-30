@@ -8,7 +8,7 @@ afterEach(() => {
 });
 
 test.each(['ja-JP', 'en-US', 'fr-FR', 'zh-CN', 'ar'])(
-  'formats recent tweets without parsing localized text (%s)',
+  'formats recent posts without parsing localized text (%s)',
   async (locale) => {
     jest.resetModules();
     jest.spyOn(window.navigator, 'language', 'get').mockReturnValue(locale);
@@ -29,7 +29,7 @@ test.each(['ja-JP', 'en-US', 'fr-FR', 'zh-CN', 'ar'])(
     ];
     for (const [offset, value, unit] of cases) {
       const timestamp = new Timestamp(new Date(+now + offset).toISOString());
-      expect(formatDate(timestamp, 'tweet')).toBe(
+      expect(formatDate(timestamp, 'post')).toBe(
         formatter.format(value, unit)
       );
     }

@@ -40,11 +40,11 @@ export type Trend = {
   url: string;
   promoted_content: null;
   query: string;
-  tweet_volume: number | null;
+  post_volume: number | null;
 };
 
 export type Trends = Trend[];
 
 export type FilteredTrends = (Trend & {
-  tweet_volume: number;
+  post_volume: number;
 })[];

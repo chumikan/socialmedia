@@ -23,7 +23,7 @@ test('register, publish, follow, interact, reply, bookmark, profile, notificatio
   await page
     .getByPlaceholder("What's happening?")
     .fill(`browser post ${suffix}`);
-  await page.getByRole('button', { name: 'Tweet', exact: true }).last().click();
+  await page.getByRole('button', { name: 'Post', exact: true }).last().click();
   await expect(
     page.getByText(`browser post ${suffix}`, { exact: true })
   ).toBeVisible();
@@ -64,7 +64,7 @@ test('register, publish, follow, interact, reply, bookmark, profile, notificatio
     await page.request.post('/api/v1/query', {
       headers,
       data: {
-        collection: 'tweets',
+        collection: 'posts',
         constraints: [
           { kind: 'where', field: 'createdBy', op: '==', value: other.id }
         ],
@@ -80,14 +80,14 @@ test('register, publish, follow, interact, reply, bookmark, profile, notificatio
   await expect(
     card.getByRole('button', { name: 'Unlike', exact: true })
   ).toBeVisible();
-  await card.getByRole('button', { name: 'Retweet', exact: true }).click();
+  await card.getByRole('button', { name: 'Repost', exact: true }).click();
   await card.getByRole('button', { name: 'Bookmark', exact: true }).click();
   await page.goto('/bookmarks');
   await expect(
     page.getByText(`followed post ${suffix}`, { exact: true })
   ).toBeVisible();
   await page.goto(`/@${other.username}/status/${post.id}`);
-  await page.getByPlaceholder('Tweet your reply').fill(`reply ${suffix}`);
+  await page.getByPlaceholder('Post your reply').fill(`reply ${suffix}`);
   await page.getByRole('button', { name: 'Reply', exact: true }).last().click();
   await expect(
     page.getByText(`reply ${suffix}`, { exact: true })

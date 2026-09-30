@@ -71,7 +71,7 @@ export function Input({
     []
   );
 
-  const sendTweet = async (): Promise<void> => {
+  const sendPost = async (): Promise<void> => {
     try {
       inputRef.current?.blur();
       setLoading(true);
@@ -81,14 +81,14 @@ export function Input({
         parentId: (reply ?? replyModal) && parent ? parent.id : null,
         mediaIds: images?.map((image) => image.id) ?? []
       };
-      const { id: tweetId } = await api<{ id: string }>(
+      const { id: postId } = await api<{ id: string }>(
         '/posts',
         'POST',
         payload
       );
 
       if (!modal && !replyModal) {
-        discardTweet();
+        discardPost();
         setLoading(false);
       }
 
@@ -97,9 +97,9 @@ export function Input({
       toast.success(
         () => (
           <span className='flex gap-2'>
-            Your Tweet was sent
+            Your Post was sent
             <Link
-              href={`/@${username}/status/${tweetId}`}
+              href={`/@${username}/status/${postId}`}
               className='custom-underline font-bold'
             >
               View
@@ -112,7 +112,7 @@ export function Input({
       setLoading(false);
       toast.error(
         () => (
-          <span className='flex gap-2'>Oops, we couldn’t send your Tweet</span>
+          <span className='flex gap-2'>Oops, we couldn’t send your Post</span>
         ),
         { duration: 6000 }
       );
@@ -167,7 +167,7 @@ export function Input({
     setImagesPreview([]);
   };
 
-  const discardTweet = (): void => {
+  const discardPost = (): void => {
     setInputValue('');
     setVisited(false);
     cleanImage();
@@ -182,7 +182,7 @@ export function Input({
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
-    void sendTweet();
+    void sendPost();
   };
 
   const handleFocus = (): void => setVisited(!loading);
@@ -195,7 +195,7 @@ export function Input({
   const isValidInput = !!inputValue.trim().length;
   const isCharLimitExceeded = inputLength > inputLimit;
 
-  const isValidTweet =
+  const isValidPost =
     !isCharLimitExceeded && (isValidInput || isUploadingImages);
 
   return (
@@ -248,11 +248,11 @@ export function Input({
             inputRef={inputRef}
             replyModal={replyModal}
             inputValue={inputValue}
-            isValidTweet={isValidTweet}
+            isValidPost={isValidPost}
             isUploadingImages={isUploadingImages}
-            sendTweet={sendTweet}
+            sendPost={sendPost}
             handleFocus={handleFocus}
-            discardTweet={discardTweet}
+            discardPost={discardPost}
             handleChange={handleChange}
             handleImageUpload={handleImageUpload}
           >
@@ -271,7 +271,7 @@ export function Input({
                 modal={modal}
                 inputLimit={inputLimit}
                 inputLength={inputLength}
-                isValidTweet={isValidTweet}
+                isValidPost={isValidPost}
                 isCharLimitExceeded={isCharLimitExceeded}
                 handleImageUpload={handleImageUpload}
               />

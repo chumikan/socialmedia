@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"testing"
@@ -11,7 +12,7 @@ import (
 	"socialmedia/backend/migrations"
 )
 
-func TestRemoveDMMigration(t *testing.T) {
+func TestUpgradeMigrations(t *testing.T) {
 	dsn := os.Getenv("TEST_DATABASE_URL")
 	if dsn == "" {
 		t.Skip("set TEST_DATABASE_URL")
@@ -55,6 +56,8 @@ func TestRemoveDMMigration(t *testing.T) {
 	if _, err = db.Exec(ctx, `
  INSERT INTO users(id,email,username,name) VALUES('a','a@test.invalid','alice','Alice'),('b','b@test.invalid','bob','Bob');
  INSERT INTO posts(id,author_id,text) VALUES('p','a','retained');
+ UPDATE users SET pinned_post_id='p' WHERE id='a';
+ INSERT INTO reposts(user_id,post_id) VALUES('b','p');
  INSERT INTO conversations(id,user_id,target_user_id) VALUES('c','a','b');
  INSERT INTO messages(id,conversation_id,user_id,text) VALUES('m','c','a','removed');
  INSERT INTO notifications(id,user_id,target_user_id,type) VALUES('dm','a','b','message'),('follow','a','b','follower');
@@ -80,4 +83,37 @@ func TestRemoveDMMigration(t *testing.T) {
  (SELECT type FROM notifications WHERE id='follow')='follower'`).Scan(&retained); err != nil || !retained {
 		t.Fatalf("unrelated data changed: %v", err)
 	}
+	var userData, postData []byte
+	if err = db.QueryRow(ctx, "SELECT data FROM user_documents WHERE id='a'").Scan(&userData); err != nil {
+		t.Fatal(err)
+	}
+	user := assertDocumentKeys(t, userData, []string{"id", "username", "name", "bio", "website", "location", "photoURL", "coverPhotoURL", "theme", "accent", "verified", "isBanned", "isAdmin", "pinnedPost", "createdAt", "updatedAt", "following", "followers", "totalPosts", "totalPhotos"})
+	if string(user["pinnedPost"]) != `"p"` || string(user["totalPosts"]) != "1" {
+		t.Fatalf("pin/count not preserved: %s", userData)
+	}
+	if err = db.QueryRow(ctx, "SELECT data FROM post_documents WHERE id='p'").Scan(&postData); err != nil {
+		t.Fatal(err)
+	}
+	post := assertDocumentKeys(t, postData, []string{"id", "text", "createdBy", "createdAt", "updatedAt", "parent", "userLikes", "userReposts", "userReplies", "images"})
+	if string(post["userReposts"]) != `["b"]` {
+		t.Fatalf("repost not preserved: %s", postData)
+	}
+
+}
+
+func assertDocumentKeys(t *testing.T, data []byte, keys []string) map[string]json.RawMessage {
+	t.Helper()
+	var document map[string]json.RawMessage
+	if err := json.Unmarshal(data, &document); err != nil {
+		t.Fatal(err)
+	}
+	if len(document) != len(keys) {
+		t.Fatalf("unexpected document keys: %s", data)
+	}
+	for _, key := range keys {
+		if _, ok := document[key]; !ok {
+			t.Fatalf("missing %s: %s", key, data)
+		}
+	}
+	return document
 }

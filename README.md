@@ -2,7 +2,7 @@
 
 既存のNext.js画面を利用するSNSです。認証・投稿・フォロー・時系列フィード・返信・いいね・リポスト・ブックマーク・プロフィール・検索・通知・BANをGo APIで処理し、画像/動画はS3互換ストレージへ保存します。
 
-プロフィールURLは`/@username`、Tweet詳細は`/@username/status/{tweetId}`です。ディレクトリ名は`[username]`を使用し、URLパラメータの`@`を取り除いてAPI・DBのusernameとして扱います。`@`なしのプロフィールURLは404となり、転送しません。
+プロフィールURLは`/@username`、Post詳細は`/@username/status/{postId}`です。ディレクトリ名は`[username]`を使用し、URLパラメータの`@`を取り除いてAPI・DBのusernameとして扱います。`@`なしのプロフィールURLは404となり、転送しません。
 
 - `frontend/`: Next.js Pages Router / TypeScript / Tailwind
 - `backend/`: 単一Go API、PostgreSQLマイグレーション、テスト、管理・インポートCLI
@@ -75,3 +75,7 @@ go run ./cmd/user -email your-local-account@example.com -admin
 GoogleログインはGOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRETを設定し、Google側に`http://localhost:3000/api/v1/auth/google/callback`を登録してください。SMTP_ADDR / SMTP_FROM / SMTP_TOを設定すると投稿作成イベントを信頼済みSMTPリレーへ送信します。未設定のイベントはoutboxに保持されます。Apple/電話ログインは旧実装でも未実装です。
 
 本番利用ではHTTPS、COOKIE_SECURE=true、正しいAPP_ORIGIN、専用S3認証情報、DB/S3バックアップ、入口のレート制限を設定してください。Composeはローカル検証用です。Google/SMTP実サービスとの疎通は個別設定後に検証してください。移行状況と制限事項は[移行計画](docs/migration-plan.md)を参照。
+
+## 投稿名の統一
+
+投稿の型・APIのquery collection・JSON項目は `Post` / `posts` / `pinnedPost` / `totalPosts` / `userReposts` に統一しています。`005_post_naming.sql` は既存データを保持したままVIEWを更新します。適用済みmigrationは履歴として保持しています。APIとfrontendを同時に更新し、ブラウザを再読み込みしてください。プロフィールおよび投稿の公開URL (`/@username/status/{postId}`) は変わりません。オフラインimportは新しいJSON形式に変換してから実行してください。

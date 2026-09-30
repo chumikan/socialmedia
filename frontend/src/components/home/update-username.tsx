@@ -128,7 +128,7 @@ export function UpdateUsername(): JSX.Element {
         onClick={openModal}
       >
         <HeroIcon className='h-5 w-5' iconName='SparklesIcon' />
-        <ToolTip tip='Top Tweets' />
+        <ToolTip tip='Top Posts' />
       </Button>
     </>
   );

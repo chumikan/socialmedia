@@ -4,7 +4,7 @@
     {"id":"legacy-b","username":"legacy_b","name":"Legacy B","createdAt":"2023-11-14T22:13:20Z","following":[]}
   ],
   "authUsers": [{"localId":"legacy-a","email":"legacy-a@example.test","passwordHash":"not-imported"}],
-  "tweets": [{"id":"legacy-post","createdBy":"legacy-b","text":"Offline #migration","createdAt":"2023-11-14T22:13:20Z","parent":null,"images":[],"userLikes":["legacy-a"],"userRetweets":["legacy-a"]}],
+  "posts": [{"id":"legacy-post","createdBy":"legacy-b","text":"Offline #migration","createdAt":"2023-11-14T22:13:20Z","parent":null,"images":[],"userLikes":["legacy-a"],"userReposts":["legacy-a"]}],
   "bookmarks": {"legacy-a":[{"id":"legacy-post","createdAt":"2023-11-14T22:13:20Z"}]},
   "notifications": [],
   "media": []

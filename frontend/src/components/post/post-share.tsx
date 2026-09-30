@@ -7,25 +7,25 @@ import { siteURL } from '@lib/env';
 import { Button } from '@components/ui/button';
 import { HeroIcon } from '@components/ui/hero-icon';
 import { ToolTip } from '@components/ui/tooltip';
-import { variants } from './tweet-actions';
+import { variants } from './post-actions';
 
 import type { JSX } from 'react';
 
-type TweetShareProps = {
+type PostShareProps = {
   username: string;
-  tweetId: string;
-  viewTweet?: boolean;
+  postId: string;
+  viewPost?: boolean;
 };
 
-export function TweetShare({
-  tweetId,
+export function PostShare({
+  postId,
   username,
-  viewTweet
-}: TweetShareProps): JSX.Element {
+  viewPost
+}: PostShareProps): JSX.Element {
   const handleCopy = (closeMenu: () => void) => async (): Promise<void> => {
     closeMenu();
     await navigator.clipboard.writeText(
-      `${siteURL}/@${username}/status/${tweetId}`
+      `${siteURL}/@${username}/status/${postId}`
     );
     toast.success('Copied to clipboard');
   };
@@ -47,7 +47,7 @@ export function TweetShare({
                          group-focus-visible:ring-accent-blue/80 group-active:bg-accent-blue/20'
             >
               <HeroIcon
-                className={viewTweet ? 'h-6 w-6' : 'h-5 w-5'}
+                className={viewPost ? 'h-6 w-6' : 'h-5 w-5'}
                 iconName='ArrowUpTrayIcon'
               />
               {!open && <ToolTip tip='Share' />}
@@ -67,7 +67,7 @@ export function TweetShare({
                   onClick={preventBubbling(handleCopy(close))}
                 >
                   <HeroIcon iconName='LinkIcon' />
-                  Copy link to Tweet
+                  Copy link to Post
                 </Popover.Button>
               </Popover.Panel>
             )}

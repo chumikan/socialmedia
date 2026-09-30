@@ -1,26 +1,26 @@
 import { useEffect } from 'react';
 import { doc } from '@lib/api/query';
 import { useDocument } from '@lib/hooks/useDocument';
-import { tweetsCollection } from '@lib/api/collections';
-import { Tweet } from '@components/tweet/tweet';
+import { postsCollection } from '@lib/api/collections';
+import { Post } from '@components/post/post';
 import type { JSX, RefObject } from 'react';
 
-type ViewParentTweetProps = {
+type ViewParentPostProps = {
   parentId: string;
-  viewTweetRef: RefObject<HTMLElement | null>;
+  viewPostRef: RefObject<HTMLElement | null>;
 };
 
-export function ViewParentTweet({
+export function ViewParentPost({
   parentId,
-  viewTweetRef
-}: ViewParentTweetProps): JSX.Element | null {
-  const { data, loading } = useDocument(doc(tweetsCollection, parentId), {
+  viewPostRef
+}: ViewParentPostProps): JSX.Element | null {
+  const { data, loading } = useDocument(doc(postsCollection, parentId), {
     includeUser: true,
     allowNull: true
   });
 
   useEffect(() => {
-    if (!loading) viewTweetRef.current?.scrollIntoView();
+    if (!loading) viewPostRef.current?.scrollIntoView();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data?.id, loading]);
 
@@ -32,7 +32,7 @@ export function ViewParentTweet({
           className='rounded-2xl bg-main-sidebar-background px-1 py-3 pl-4 
                      text-light-secondary dark:text-dark-secondary'
         >
-          This Tweet was deleted by the Tweet author.{' '}
+          This Post was deleted by the Post author.{' '}
           <a
             className='custom-underline text-main-accent'
             href='https://help.twitter.com/rules-and-policies/notices-on-twitter'
@@ -45,5 +45,5 @@ export function ViewParentTweet({
       </div>
     );
 
-  return <Tweet parentTweet {...data} />;
+  return <Post parentPost {...data} />;
 }

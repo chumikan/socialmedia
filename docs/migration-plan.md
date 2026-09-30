@@ -5,8 +5,8 @@
 - `src/lib/firebase/{app,collections,utils}.ts`: Auth, Firestore, Storage and Functions SDK initialization, direct writes, counters and uploads.
 - `src/lib/context/auth-context.tsx`: email/password and Google authentication, client-created profiles/stats; administrator inferred from username.
 - `src/lib/hooks/use{Collection,Document,ArrayDocument,InfiniteScroll}` plus page/component imports: snapshots, filters and growing-limit pagination.
-- Collections: users, tweets, users/*/stats, users/*/bookmarks, trends, notifications. Timestamp objects, embedded media and arrays of follower/like/repost IDs.
-- `functions/src/normalize-stats.ts`: cleanup after tweet deletion. `notify-email.ts`: Gmail new-post notification.
+- Collections: users, posts, users/*/stats, users/*/bookmarks, trends, notifications. Timestamp objects, embedded media and arrays of follower/like/repost IDs.
+- `functions/src/normalize-stats.ts`: cleanup after post deletion. `notify-email.ts`: Gmail new-post notification.
 - Firestore rules include a catch-all authenticated read/write grant; private data access and administrator authority must be enforced by the API instead. Storage: authenticated media reads, owner uploads, 50 MiB limit. Fixed administrator UID in rules.
 - Socket.IO API verifies Firebase token; online presence UI currently returns a placeholder. No actual Realtime Database calls found.
 - Jest configured but no test files found; CI test step commented out. CI assumes root npm project despite yarn lockfile.

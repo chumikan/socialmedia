@@ -19,10 +19,10 @@ for (const width of [1440, 390]) {
     expect(response.ok()).toBeTruthy();
     await page.goto('/home');
     for (let index = 0; index < 2; index++) {
-      const text = `sidebar tweet ${width} ${Date.now()} ${index}`;
+      const text = `sidebar post ${width} ${Date.now()} ${index}`;
       await page
         .locator('#sidebar')
-        .getByRole('button', { name: 'Tweet', exact: true })
+        .getByRole('button', { name: 'Post', exact: true })
         .click();
       const dialog = page.getByRole('dialog');
       await dialog.getByPlaceholder("What's happening?").fill(text);
@@ -41,7 +41,7 @@ for (const width of [1440, 390]) {
           response.url().endsWith('/api/v1/posts') &&
           response.request().method() === 'POST'
       );
-      await dialog.getByRole('button', { name: 'Tweet', exact: true }).click();
+      await dialog.getByRole('button', { name: 'Post', exact: true }).click();
       expect((await saved).ok()).toBeTruthy();
       await expect(dialog).toHaveCount(0);
       await expect(
@@ -76,7 +76,7 @@ test('home composer and inline reply remain usable in Japanese', async ({
       response.url().endsWith('/api/v1/posts') &&
       response.request().method() === 'POST'
   );
-  await composer.getByRole('button', { name: 'Tweet', exact: true }).click();
+  await composer.getByRole('button', { name: 'Post', exact: true }).click();
   const postResponse = await saved;
   expect(postResponse.ok()).toBeTruthy();
   const post: { id: string } = await postResponse.json();
@@ -84,7 +84,7 @@ test('home composer and inline reply remain usable in Japanese', async ({
   await expect(page).toHaveURL('/home');
   await expect(composer.getByPlaceholder("What's happening?")).toHaveValue('');
   await page.goto(`/@${user.username}/status/${post.id}`);
-  await page.getByPlaceholder('Tweet your reply').fill('日本語の返信');
+  await page.getByPlaceholder('Post your reply').fill('日本語の返信');
   await page.getByRole('button', { name: 'Reply', exact: true }).last().click();
   await expect(
     page.locator('article').filter({ hasText: '日本語の返信' })

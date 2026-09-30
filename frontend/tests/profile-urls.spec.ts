@@ -56,10 +56,10 @@ test('profile routes, navigation, mentions and notifications use one @ prefix', 
     page.getByRole('button', { name: 'Follow', exact: true }).first()
   ).toBeVisible();
   for (const [name, suffix] of [
-    ['Tweets & replies', 'with_replies'],
+    ['Posts & replies', 'with_replies'],
     ['Media', 'media'],
     ['Likes', 'likes'],
-    ['Tweets', '']
+    ['Posts', '']
   ]) {
     const link = page.getByRole('link', { name, exact: true });
     await expect(link).toHaveAttribute(
@@ -87,14 +87,14 @@ test('profile routes, navigation, mentions and notifications use one @ prefix', 
   await expect(page).toHaveURL(`${profile}/followers`);
 
   await page.goto(`${profile}/status/${post.id}`);
-  const tweet = page.locator('article').filter({ hasText: text });
-  const mention = tweet.getByRole('link', {
+  const postArticle = page.locator('article').filter({ hasText: text });
+  const mention = postArticle.getByRole('link', {
     name: `@${me.username}`,
     exact: true
   });
   await expect(mention).toHaveAttribute('href', `/@${me.username}`);
   await expect(
-    tweet.getByRole('link', {
+    postArticle.getByRole('link', {
       name: `https://example.test/@${me.username}`,
       exact: true
     })
@@ -187,7 +187,7 @@ test('share URLs use the author and deleting a reply returns to its parent', asy
     .filter({ has: page.getByText('Share', { exact: true }) })
     .click();
   await page
-    .getByRole('button', { name: 'Copy link to Tweet', exact: true })
+    .getByRole('button', { name: 'Copy link to Post', exact: true })
     .click();
   expect(
     new URL(await page.evaluate(() => navigator.clipboard.readText())).pathname
@@ -200,7 +200,7 @@ test('share URLs use the author and deleting a reply returns to its parent', asy
     .filter({ has: page.getByText('Share', { exact: true }) })
     .click();
   await page
-    .getByRole('button', { name: 'Copy link to Tweet', exact: true })
+    .getByRole('button', { name: 'Copy link to Post', exact: true })
     .click();
   expect(
     new URL(await page.evaluate(() => navigator.clipboard.readText())).pathname
@@ -230,7 +230,7 @@ test('share URLs use the author and deleting a reply returns to its parent', asy
     .click();
   await expect(page).toHaveURL(`${profile}/status/${post.id}`);
   await expect(
-    page.getByText('Your Tweet was deleted', { exact: true })
+    page.getByText('Your Post was deleted', { exact: true })
   ).toBeVisible();
 });
 

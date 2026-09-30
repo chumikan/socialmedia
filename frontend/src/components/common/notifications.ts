@@ -12,11 +12,11 @@ const placeholder = {
     description: '#name is now following your account.'
   },
   liked: {
-    title: 'Someone liked your Tweet',
-    description: '#name liked your Tweet.'
+    title: 'Someone liked your Post',
+    description: '#name liked your Post.'
   },
-  reply: { title: 'New reply', description: '#name replied to your Tweet.' },
-  repost: { title: 'New repost', description: '#name reposted your Tweet.' }
+  reply: { title: 'New reply', description: '#name replied to your Post.' },
+  repost: { title: 'New repost', description: '#name reposted your Post.' }
 };
 
 const ReplaceParams = (

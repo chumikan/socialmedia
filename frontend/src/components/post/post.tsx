@@ -6,28 +6,28 @@ import { useAuth } from '@lib/context/auth-context';
 import { useModal } from '@lib/hooks/useModal';
 import { delayScroll } from '@lib/utils';
 import { Modal } from '@components/modal/modal';
-import { TweetReplyModal } from '@components/modal/tweet-reply-modal';
+import { PostReplyModal } from '@components/modal/post-reply-modal';
 import { ImagePreview } from '@components/input/image-preview';
 import { UserAvatar } from '@components/user/user-avatar';
 import { UserTooltip } from '@components/user/user-tooltip';
 import { UserName } from '@components/user/user-name';
 import { UserUsername } from '@components/user/user-username';
-import { TweetActions } from './tweet-actions';
-import { TweetStatus } from './tweet-status';
-import { TweetStats } from './tweet-stats';
-import { TweetDate } from './tweet-date';
+import { PostActions } from './post-actions';
+import { PostStatus } from './post-status';
+import { PostStats } from './post-stats';
+import { PostDate } from './post-date';
 import type { Variants } from 'framer-motion';
-import type { Tweet } from '@lib/types/tweet';
+import type { Post } from '@lib/types/post';
 import type { User } from '@lib/types/user';
 
 import type { JSX } from 'react';
 
-export type TweetProps = Tweet & {
+export type PostProps = Post & {
   user: User;
   modal?: boolean;
   pinned?: boolean;
   profile?: User | null;
-  parentTweet?: boolean;
+  parentPost?: boolean;
 };
 
 export const variants: Variants = {
@@ -36,9 +36,9 @@ export const variants: Variants = {
   exit: { opacity: 0, transition: { duration: 0.2 } }
 };
 
-export function Tweet(tweet: TweetProps): JSX.Element {
+export function Post(post: PostProps): JSX.Element {
   const {
-    id: tweetId,
+    id: postId,
     text,
     modal,
     images,
@@ -48,19 +48,19 @@ export function Tweet(tweet: TweetProps): JSX.Element {
     userLikes,
     createdBy,
     createdAt,
-    parentTweet,
+    parentPost,
     userReplies,
-    userRetweets,
-    user: tweetUserData
-  } = tweet;
+    userReposts,
+    user: postUserData
+  } = post;
 
-  const { id: ownerId, name, username, verified, photoURL } = tweetUserData;
+  const { id: ownerId, name, username, verified, photoURL } = postUserData;
 
   const { user } = useAuth();
 
   const { open, openModal, closeModal } = useModal();
 
-  const tweetLink = `/@${username}/status/${tweetId}`;
+  const postLink = `/@${username}/status/${postId}`;
 
   const userId = user?.id as string;
 
@@ -75,14 +75,14 @@ export function Tweet(tweet: TweetProps): JSX.Element {
   } = profile ?? {};
 
   const reply = !!parent;
-  const tweetIsRetweeted = userRetweets.includes(profileId ?? '');
+  const postIsReposted = userReposts.includes(profileId ?? '');
 
   return (
     <motion.article
       {...(!modal ? { ...variants, layout: 'position' } : {})}
       animate={{
         ...variants.animate,
-        ...(parentTweet && { transition: { duration: 0.2 } })
+        ...(parentPost && { transition: { duration: 0.2 } })
       }}
     >
       <Modal
@@ -91,15 +91,15 @@ export function Tweet(tweet: TweetProps): JSX.Element {
         open={open}
         closeModal={closeModal}
       >
-        <TweetReplyModal tweet={tweet} closeModal={closeModal} />
+        <PostReplyModal post={post} closeModal={closeModal} />
       </Modal>
       <Link
-        href={tweetLink}
+        href={postLink}
         scroll={!reply}
         className={cn(
           `accent-tab hover-card relative flex flex-col 
              gap-y-4 px-4 py-3 outline-none duration-200`,
-          parentTweet
+          parentPost
             ? 'mt-0.5 pb-0 pt-2.5'
             : 'border-b border-light-border dark:border-dark-border'
         )}
@@ -109,12 +109,12 @@ export function Tweet(tweet: TweetProps): JSX.Element {
         <div className='grid grid-cols-[auto,1fr] gap-x-3 gap-y-1'>
           <AnimatePresence initial={false}>
             {modal ? null : pinned ? (
-              <TweetStatus type='pin'>
-                <p className='text-sm font-bold'>Pinned Tweet</p>
-              </TweetStatus>
+              <PostStatus type='pin'>
+                <p className='text-sm font-bold'>Pinned Post</p>
+              </PostStatus>
             ) : (
-              tweetIsRetweeted && (
-                <TweetStatus type='tweet'>
+              postIsReposted && (
+                <PostStatus type='post'>
                   <Link
                     href={`/@${profileUsername as string}`}
                     className='custom-underline truncate text-sm font-bold'
@@ -128,28 +128,28 @@ export function Tweet(tweet: TweetProps): JSX.Element {
                         }}
                       />
                     )}{' '}
-                    Retweeted
+                    Reposted
                   </Link>
-                </TweetStatus>
+                </PostStatus>
               )
             )}
           </AnimatePresence>
           <div className='flex flex-col items-center gap-2'>
-            <UserTooltip avatar modal={modal} {...tweetUserData}>
+            <UserTooltip avatar modal={modal} {...postUserData}>
               <UserAvatar
                 src={photoURL}
                 alt={name ?? username}
                 username={username}
               />
             </UserTooltip>
-            {parentTweet && (
+            {parentPost && (
               <i className='hover-animation h-full w-0.5 bg-light-line-reply dark:bg-dark-line-reply' />
             )}
           </div>
           <div className='flex min-w-0 flex-col'>
             <div className='flex justify-between gap-2 text-light-secondary dark:text-dark-secondary'>
               <div className='flex gap-1 truncate xs:overflow-visible xs:whitespace-normal'>
-                <UserTooltip modal={modal} {...tweetUserData}>
+                <UserTooltip modal={modal} {...postUserData}>
                   <UserName
                     name={name ?? username}
                     username={username}
@@ -157,17 +157,17 @@ export function Tweet(tweet: TweetProps): JSX.Element {
                     className='text-light-primary dark:text-dark-primary'
                   />
                 </UserTooltip>
-                <UserTooltip modal={modal} {...tweetUserData}>
+                <UserTooltip modal={modal} {...postUserData}>
                   <UserUsername username={username} />
                 </UserTooltip>
-                <TweetDate tweetLink={tweetLink} createdAt={createdAt} />
+                <PostDate postLink={postLink} createdAt={createdAt} />
               </div>
               <div className='px-4'>
                 {!modal && (
-                  <TweetActions
+                  <PostActions
                     isOwner={isOwner}
                     ownerId={ownerId}
-                    tweetId={tweetId}
+                    postId={postId}
                     parentId={parentId}
                     parentUsername={parentUsername}
                     username={username}
@@ -207,22 +207,22 @@ export function Tweet(tweet: TweetProps): JSX.Element {
             <div className='mt-1 flex flex-col gap-2'>
               {images && (
                 <ImagePreview
-                  tweet
+                  post
                   imagesPreview={images}
                   previewCount={images.length}
                 />
               )}
               {!modal && (
-                <TweetStats
+                <PostStats
                   reply={reply}
                   userId={userId}
                   isOwner={isOwner}
-                  tweetId={tweetId}
-                  tweetCreatedBy={createdBy}
+                  postId={postId}
+                  postCreatedBy={createdBy}
                   username={username}
                   userLikes={userLikes}
                   userReplies={userReplies}
-                  userRetweets={userRetweets}
+                  userReposts={userReposts}
                   openModal={!parent ? openModal : undefined}
                 />
               )}

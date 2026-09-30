@@ -98,7 +98,7 @@ export function AsideTrends({ inTrendsPage }: AsideTrendsProps): JSX.Element {
                 />
               </p>
               <p className='text-sm text-light-secondary dark:text-dark-secondary'>
-                {`${formatNumber(counter)} Tweet${counter === 1 ? '' : 's'}`}
+                {`${formatNumber(counter)} Post${counter === 1 ? '' : 's'}`}
               </p>
             </Link>
           ))}

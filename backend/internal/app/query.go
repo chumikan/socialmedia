@@ -151,9 +151,9 @@ func compileQuery(in QueryInput, uid string) (string, []any, error) {
 	case "users":
 		base = "SELECT id,data FROM user_documents"
 		addFields("username name following followers isBanned")
-	case "tweets", "feed":
+	case "posts", "feed":
 		base = "SELECT id,data FROM post_documents"
-		addFields("createdBy parent parent.id images userLikes userRetweets text")
+		addFields("createdBy parent parent.id images userLikes userReposts text")
 		if in.Collection == "feed" {
 			security = "(author_id=$1 OR EXISTS(SELECT 1 FROM follows WHERE follower_id=$1 AND followed_id=author_id) OR EXISTS(SELECT 1 FROM reposts rp JOIN follows f ON f.followed_id=rp.user_id WHERE f.follower_id=$1 AND rp.post_id=post_documents.id))"
 		}
@@ -176,7 +176,7 @@ func compileQuery(in QueryInput, uid string) (string, []any, error) {
 			base = "SELECT b.post_id AS id,jsonb_build_object('id',b.post_id,'createdAt',b.created_at) AS data FROM bookmarks b JOIN post_documents p ON p.id=b.post_id WHERE b.user_id=$1"
 		} else if parts[2] == "stats" {
 			args = append(args, parts[1])
-			base = `SELECT 'stats' AS id,jsonb_build_object('id','stats','likes',coalesce((SELECT jsonb_agg(post_id) FROM likes WHERE user_id=$2),'[]'),'tweets',coalesce((SELECT jsonb_agg(id) FROM (SELECT id FROM posts WHERE author_id=$2 UNION SELECT post_id FROM reposts WHERE user_id=$2) s),'[]'),'updatedAt',null) AS data WHERE $1::text IS NOT NULL`
+			base = `SELECT 'stats' AS id,jsonb_build_object('id','stats','likes',coalesce((SELECT jsonb_agg(post_id) FROM likes WHERE user_id=$2),'[]'),'posts',coalesce((SELECT jsonb_agg(id) FROM (SELECT id FROM posts WHERE author_id=$2 UNION SELECT post_id FROM reposts WHERE user_id=$2) s),'[]'),'updatedAt',null) AS data WHERE $1::text IS NOT NULL`
 		} else {
 			return "", nil, bad("unknown collection")
 		}
@@ -227,7 +227,7 @@ func compileQuery(in QueryInput, uid string) (string, []any, error) {
 			field = orderField
 			op = "<="
 		}
-		if op == "search" && field == "text" && (in.Collection == "tweets" || in.Collection == "feed") {
+		if op == "search" && field == "text" && (in.Collection == "posts" || in.Collection == "feed") {
 			text, ok := c.Value.(string)
 			if !ok || len(text) > 200 {
 				return "", nil, bad("invalid search")

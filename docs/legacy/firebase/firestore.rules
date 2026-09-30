@@ -17,7 +17,7 @@ service cloud.firestore {
       return (images is list && images.size() <= 4) || images == null;
     }
     
-    match /{path=**}/status/{tweetId} {
+    match /{path=**}/status/{postId} {
       allow read, update: if request.auth != null;
       allow create: if isAuthorized(request.resource.data.createdBy)
                        && isValidText(request.resource.data.text)
@@ -25,14 +25,14 @@ service cloud.firestore {
       allow delete: if isAuthorized(resource.data.createdBy);
     }
     
-    match /trends/{tweetId} {
+    match /trends/{postId} {
       allow read, update: if request.auth != null;
       allow create: if isAuthorized(request.resource.data.createdBy)
                        && isValidText(request.resource.data.text)
       allow delete: if isAuthorized(resource.data.createdBy);
     }
 
-    match /notifications/{tweetId} {
+    match /notifications/{postId} {
       allow read, update: if request.auth != null;
       allow create: if isAuthorized(request.resource.data.userId)
                        && isValidText(request.resource.data.type)

@@ -1,3 +1,3 @@
 export * from './user';
-export * from './tweet';
+export * from './post';
 export * from './bookmark';
