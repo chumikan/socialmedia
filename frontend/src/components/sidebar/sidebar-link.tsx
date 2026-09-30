@@ -25,6 +25,8 @@ export function SidebarLink({
   return (
     <Link
       href={href}
+      aria-label={linkName}
+      title={linkName}
       className={cn(
         'group py-1 outline-none',
         canBeHidden ? 'hidden xs:flex' : 'flex',
@@ -37,7 +39,7 @@ export function SidebarLink({
           `custom-button flex items-center justify-center gap-4 self-start p-2 text-xl transition 
              duration-200 group-hover:bg-light-primary/10 group-focus-visible:ring-2 
              group-focus-visible:ring-[#878a8c] dark:group-hover:bg-dark-primary/10 
-             dark:group-focus-visible:ring-white xs:p-3 xl:pr-5`,
+             dark:group-focus-visible:ring-white xs:p-3`,
           isActive && 'font-bold'
         )}
       >
@@ -51,7 +53,6 @@ export function SidebarLink({
           iconName={iconName}
           solid={isActive}
         />
-        <p className='hidden xl:block'>{linkName}</p>
       </div>
     </Link>
   );

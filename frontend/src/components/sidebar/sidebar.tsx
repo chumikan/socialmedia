@@ -99,8 +99,7 @@ export function Sidebar(): JSX.Element {
   return (
     <header
       id='sidebar'
-      className='flex w-0 shrink-0 transition-opacity duration-200 xs:w-20 md:w-24
-                 lg:max-w-none xl:-mr-4 xl:w-full xl:max-w-xs xl:justify-end'
+      className='flex w-0 shrink-0 transition-opacity duration-200 xs:w-20 md:w-24'
     >
       <Modal
         className='flex items-start justify-center'
@@ -113,12 +112,13 @@ export function Sidebar(): JSX.Element {
       <div
         className='fixed bottom-0 z-10 flex w-full flex-col justify-between border-t border-light-border 
                    bg-main-background py-0 dark:border-dark-border xs:top-0 xs:h-full xs:w-auto xs:border-0 
-                   xs:bg-transparent xs:px-2 xs:py-3 xs:pt-2 md:px-4 xl:w-72'
+                   xs:bg-transparent xs:px-2 xs:py-3 xs:pt-2 md:px-4'
       >
-        <section className='flex flex-col justify-center gap-2 xs:items-center xl:items-stretch'>
+        <section className='flex flex-col justify-center gap-2 xs:items-center'>
           <h1 className='hidden xs:flex'>
             <Link
               href='/home'
+              aria-label='Home'
               className='custom-button main-tab text-accent-blue transition hover:bg-light-primary/10  focus-visible:bg-accent-blue/10 focus-visible:!ring-accent-blue/80 dark:text-twitter-icon dark:hover:bg-dark-primary/10'
             >
               <CustomIcon
@@ -127,7 +127,7 @@ export function Sidebar(): JSX.Element {
               />
             </Link>
           </h1>
-          <nav className='flex items-center justify-around xs:flex-col xs:justify-center xl:block'>
+          <nav className='flex items-center justify-around xs:flex-col xs:justify-center'>
             {navLinksWithCount.map(({ ...linkData }) => (
               <SidebarLink {...linkData} key={linkData.href} />
             ))}
@@ -141,16 +141,14 @@ export function Sidebar(): JSX.Element {
             {!isMobile && <MoreSettings />}
           </nav>
           <Button
-            className='accent-tab absolute right-4 -translate-y-[72px] bg-main-accent text-lg font-bold text-white
+            aria-label='Tweet'
+            title='Tweet'
+            className='accent-tab absolute right-4 flex h-14 w-14 -translate-y-[72px] items-center justify-center rounded-full bg-main-accent p-0 text-white
                        outline-none transition hover:brightness-90 active:brightness-75 xs:static xs:translate-y-0
-                       xs:hover:bg-main-accent/90 xs:active:bg-main-accent/75 xl:w-11/12'
+                       xs:hover:bg-main-accent/90 xs:active:bg-main-accent/75'
             onClick={openModal}
           >
-            <CustomIcon
-              className='block h-6 w-6 xl:hidden'
-              iconName='FeatherIcon'
-            />
-            <p className='hidden xl:block'>Tweet</p>
+            <CustomIcon className='h-6 w-6' iconName='FeatherIcon' />
           </Button>
         </section>
         {!isMobile && <SidebarProfile />}
