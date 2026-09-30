@@ -101,19 +101,9 @@ function getJoinedTime(date: Date): string {
 }
 
 function getRelativeTime(date: Date): string {
-  const relativeTime = calculateRelativeTime(date);
-
-  if (relativeTime === 'now') return relativeTime;
-
-  const [number, unit] = relativeTime.split(' ');
-
-  return `${number}${unit[0]}`;
-}
-
-function calculateRelativeTime(date: Date): string {
   const elapsed = +date - +new Date();
 
-  if (elapsed > 0) return 'now';
+  if (elapsed > 0) return RELATIVE_TIME_FORMATTER.format(0, 'second');
 
   const unitsItems = Object.entries(UNITS) as [keyof Units, number][];
 

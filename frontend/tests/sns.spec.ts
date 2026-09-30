@@ -45,10 +45,16 @@ test('register, publish, follow, interact, reply, bookmark, profile, notificatio
     data: { text: `followed post ${suffix}`, parentId: null, mediaIds: [] }
   });
   await page.goto(`/@${other.username}`);
+  const followed = page.waitForResponse(
+    (response) =>
+      response.url().endsWith(`/api/v1/users/${other.id}/follow`) &&
+      response.request().method() === 'PUT'
+  );
   await page
     .getByRole('button', { name: 'Follow', exact: true })
     .first()
     .click();
+  expect((await followed).ok()).toBeTruthy();
   await page.goto('/home');
   await expect(
     page.getByText(`followed post ${suffix}`, { exact: true })

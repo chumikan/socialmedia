@@ -9,6 +9,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint src --max-warnings 0",
     "test": "playwright test",
+    "test:unit": "jest --runInBand --testPathPattern=unit-tests",
     "test:ci": "playwright test",
     "format": "prettier --check src",
     "format:write": "prettier --write src"
