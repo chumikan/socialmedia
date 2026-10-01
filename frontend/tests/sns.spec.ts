@@ -21,6 +21,10 @@ test('register, publish, follow, interact, reply, profile, notifications', async
   await expect(page).toHaveURL(/\/home/);
   const me = await (await page.request.get('/api/v1/auth/me')).json();
   await page
+    .locator('#sidebar')
+    .getByRole('button', { name: 'Post', exact: true })
+    .click();
+  await page
     .getByPlaceholder("What's happening?")
     .fill(`browser post ${suffix}`);
   await page.getByRole('button', { name: 'Post', exact: true }).last().click();
@@ -87,8 +91,12 @@ test('register, publish, follow, interact, reply, profile, notifications', async
   );
   await card.getByRole('button', { name: 'Repost', exact: true }).click();
   expect((await reposted).ok()).toBeTruthy();
-  await expect(page.getByRole('link', { name: 'Bookmarks', exact: true })).toHaveCount(0);
-  await expect(card.getByRole('button', { name: 'Bookmark', exact: true })).toHaveCount(0);
+  await expect(
+    page.getByRole('link', { name: 'Bookmarks', exact: true })
+  ).toHaveCount(0);
+  await expect(
+    card.getByRole('button', { name: 'Bookmark', exact: true })
+  ).toHaveCount(0);
   await page.goto(`/@${other.username}/status/${post.id}`);
   await page.getByPlaceholder('Post your reply').fill(`reply ${suffix}`);
   await page.getByRole('button', { name: 'Reply', exact: true }).last().click();

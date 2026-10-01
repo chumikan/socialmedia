@@ -53,7 +53,7 @@ for (const width of [1440, 390]) {
   });
 }
 
-test('home composer and inline reply remain usable in Japanese', async ({
+test('sidebar composer and inline reply remain usable in Japanese', async ({
   page
 }) => {
   const errors: string[] = [];
@@ -69,7 +69,14 @@ test('home composer and inline reply remain usable in Japanese', async ({
   const user: { username: string } = await response.json();
   await page.goto('/home');
   const text = `日本語の投稿 ${Date.now()}`;
-  const composer = page.locator('main form').first();
+  await expect(
+    page.locator('main').getByPlaceholder("What's happening?")
+  ).toHaveCount(0);
+  await page
+    .locator('#sidebar')
+    .getByRole('button', { name: 'Post', exact: true })
+    .click();
+  const composer = page.getByRole('dialog');
   await composer.getByPlaceholder("What's happening?").fill(text);
   const saved = page.waitForResponse(
     (response) =>
@@ -82,7 +89,7 @@ test('home composer and inline reply remain usable in Japanese', async ({
   const post: { id: string } = await postResponse.json();
   await expect(page.locator('article').filter({ hasText: text })).toBeVisible();
   await expect(page).toHaveURL('/home');
-  await expect(composer.getByPlaceholder("What's happening?")).toHaveValue('');
+  await expect(composer).toHaveCount(0);
   await page.goto(`/@${user.username}/status/${post.id}`);
   await page.getByPlaceholder('Post your reply').fill('日本語の返信');
   await page.getByRole('button', { name: 'Reply', exact: true }).last().click();

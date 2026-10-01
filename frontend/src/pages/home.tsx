@@ -1,12 +1,10 @@
 import { AnimatePresence } from 'framer-motion';
 import { where, orderBy, collection } from '@lib/api/query';
-import { useWindow } from '@lib/context/window-context';
 import { useInfiniteScroll } from '@lib/hooks/useInfiniteScroll';
 import { HomeLayout, ProtectedLayout } from '@components/layout/common-layout';
 import { MainLayout } from '@components/layout/main-layout';
 import { SEO } from '@components/common/seo';
 import { MainContainer } from '@components/home/main-container';
-import { Input } from '@components/input/input';
 import { UpdateUsername } from '@components/home/update-username';
 import { MainHeader } from '@components/home/main-header';
 import { Post } from '@components/post/post';
@@ -15,8 +13,6 @@ import type { Post as PostData } from '@lib/types/post';
 import type { ReactElement, ReactNode, JSX } from 'react';
 
 export default function Home(): JSX.Element {
-  const { isMobile } = useWindow();
-
   const { data, loading, LoadMore } = useInfiniteScroll(
     collection<PostData>('feed'),
     [where('parent', '==', null), orderBy('createdAt', 'desc')],
@@ -33,7 +29,6 @@ export default function Home(): JSX.Element {
       >
         <UpdateUsername />
       </MainHeader>
-      {!isMobile && <Input />}
       <section className='mt-0.5 xs:mt-0'>
         {loading ? (
           <Loading className='mt-5' />
