@@ -14,7 +14,6 @@ export async function checkUsernameAvailability(
     [
       'home',
       'notifications',
-      'bookmarks',
       'explore',
       'api',
       'admin',
@@ -86,17 +85,6 @@ export function manageLike(
   return async () => {
     await api(`/posts/${post.id}/like`, type === 'like' ? 'PUT' : 'DELETE');
   };
-}
-export async function manageBookmark(
-  type: 'bookmark' | 'unbookmark',
-  _userId: string,
-  id: string
-): Promise<void> {
-  await api(`/posts/${id}/bookmark`, type === 'bookmark' ? 'PUT' : 'DELETE');
-}
-export async function clearAllBookmarks(_userId: string): Promise<void> {
-  void _userId;
-  await api('/bookmarks', 'DELETE');
 }
 export async function uploadImages(
   _userId: string,

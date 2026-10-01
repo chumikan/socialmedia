@@ -78,11 +78,10 @@ func (a *App) Handler() http.Handler {
 	m.HandleFunc("POST /api/v1/query", a.wrap(a.query))
 	m.HandleFunc("POST /api/v1/posts", a.wrap(a.createPost))
 	m.HandleFunc("DELETE /api/v1/posts/{id}", a.wrap(a.deletePost))
-	for _, action := range []string{"like", "repost", "bookmark"} {
+	for _, action := range []string{"like", "repost"} {
 		m.HandleFunc("PUT /api/v1/posts/{id}/"+action, a.wrap(a.interaction(action, true)))
 		m.HandleFunc("DELETE /api/v1/posts/{id}/"+action, a.wrap(a.interaction(action, false)))
 	}
-	m.HandleFunc("DELETE /api/v1/bookmarks", a.wrap(a.clearBookmarks))
 	m.HandleFunc("PATCH /api/v1/users/{id}", a.wrap(a.updateUser))
 	m.HandleFunc("PUT /api/v1/users/{id}/follow", a.wrap(a.follow(true)))
 	m.HandleFunc("DELETE /api/v1/users/{id}/follow", a.wrap(a.follow(false)))

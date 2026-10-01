@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { CiHome, CiBellOn, CiBookmark, CiUser, CiSearch } from 'react-icons/ci';
+import { CiHome, CiBellOn, CiUser, CiSearch } from 'react-icons/ci';
 import { useState, useEffect } from 'react';
 import { query, where } from '@lib/api/query';
 import { useAuth } from '@lib/context/auth-context';
@@ -51,6 +51,13 @@ export function Sidebar(): JSX.Element {
       icon: <CiHome size={34} />
     },
     {
+      href: '/explore',
+      linkName: 'Search',
+      disabled: false,
+      iconName: 'MagnifyingGlassIcon',
+      icon: <CiSearch size={34} />
+    },
+    {
       href: '/notifications',
       linkName: 'Notifications',
       disabled: false,
@@ -58,22 +65,6 @@ export function Sidebar(): JSX.Element {
       count: 0,
       iconName: 'BellIcon',
       icon: <CiBellOn size={34} />
-    },
-    {
-      href: '/bookmarks',
-      linkName: 'Bookmarks',
-      canBeHidden: true,
-      count: 0,
-      iconName: 'BookmarkIcon',
-      icon: <CiBookmark size={34} />
-    },
-    {
-      href: '/explore',
-      linkName: 'Search',
-      disabled: false,
-      canBeHidden: true,
-      iconName: 'Bars3BottomLeftIcon',
-      icon: <CiSearch size={34} />
     }
   ]);
 
@@ -99,7 +90,7 @@ export function Sidebar(): JSX.Element {
   return (
     <header
       id='sidebar'
-      className='flex w-0 shrink-0 transition-opacity duration-200 xs:w-20 md:w-24'
+      className='flex w-0 shrink-0 transition-opacity duration-200 xs:w-24'
     >
       <Modal
         className='flex items-start justify-center'

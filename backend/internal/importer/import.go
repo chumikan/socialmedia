@@ -53,12 +53,11 @@ type Media struct {
 	LegacyURL   string `json:"legacyURL"`
 }
 type Export struct {
-	Users         []Document            `json:"users"`
-	Posts         []Document            `json:"posts"`
-	Notifications []Document            `json:"notifications"`
-	Bookmarks     map[string][]Document `json:"bookmarks"`
-	Media         []Media               `json:"media"`
-	AuthUsers     []Document            `json:"authUsers"`
+	Users         []Document `json:"users"`
+	Posts         []Document `json:"posts"`
+	Notifications []Document `json:"notifications"`
+	Media         []Media    `json:"media"`
+	AuthUsers     []Document `json:"authUsers"`
 }
 
 func (e Export) Validate() error {
@@ -202,13 +201,6 @@ func (e Export) Apply(ctx context.Context, db *pgxpool.Pool) error {
 		}
 		if pin := u.String("pinnedPost"); pin != "" {
 			if err = exec("UPDATE users SET pinned_post_id=$1 WHERE id=$2 AND pinned_post_id IS NULL", pin, u.String("id")); err != nil {
-				return err
-			}
-		}
-	}
-	for uid, bookmarks := range e.Bookmarks {
-		for _, b := range bookmarks {
-			if err = exec("INSERT INTO bookmarks(user_id,post_id,created_at) VALUES($1,$2,$3) ON CONFLICT DO NOTHING", uid, b.String("id"), b.Time("createdAt")); err != nil {
 				return err
 			}
 		}

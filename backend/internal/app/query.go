@@ -169,12 +169,7 @@ func compileQuery(in QueryInput, uid string) (string, []any, error) {
 		if len(parts) != 3 || parts[0] != "users" {
 			return "", nil, bad("unknown collection")
 		}
-		if parts[2] == "bookmarks" {
-			if parts[1] != uid {
-				return "", nil, forbidden()
-			}
-			base = "SELECT b.post_id AS id,jsonb_build_object('id',b.post_id,'createdAt',b.created_at) AS data FROM bookmarks b JOIN post_documents p ON p.id=b.post_id WHERE b.user_id=$1"
-		} else if parts[2] == "stats" {
+		if parts[2] == "stats" {
 			args = append(args, parts[1])
 			base = `SELECT 'stats' AS id,jsonb_build_object('id','stats','likes',coalesce((SELECT jsonb_agg(post_id) FROM likes WHERE user_id=$2),'[]'),'posts',coalesce((SELECT jsonb_agg(id) FROM (SELECT id FROM posts WHERE author_id=$2 UNION SELECT post_id FROM reposts WHERE user_id=$2) s),'[]'),'updatedAt',null) AS data WHERE $1::text IS NOT NULL`
 		} else {

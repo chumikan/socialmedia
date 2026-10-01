@@ -5,7 +5,6 @@
   ],
   "authUsers": [{"localId":"legacy-a","email":"legacy-a@example.test","passwordHash":"not-imported"}],
   "posts": [{"id":"legacy-post","createdBy":"legacy-b","text":"Offline #migration","createdAt":"2023-11-14T22:13:20Z","parent":null,"images":[],"userLikes":["legacy-a"],"userReposts":["legacy-a"]}],
-  "bookmarks": {"legacy-a":[{"id":"legacy-post","createdAt":"2023-11-14T22:13:20Z"}]},
   "notifications": [],
   "media": []
 }

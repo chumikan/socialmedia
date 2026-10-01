@@ -1,6 +1,6 @@
 # OpenTwitter — Next.js + Go + PostgreSQL
 
-既存のNext.js画面を利用するSNSです。認証・投稿・フォロー・時系列フィード・返信・いいね・リポスト・ブックマーク・プロフィール・検索・通知・BANをGo APIで処理し、画像/動画はS3互換ストレージへ保存します。
+既存のNext.js画面を利用するSNSです。認証・投稿・フォロー・時系列フィード・返信・いいね・リポスト・プロフィール・検索・通知・BANをGo APIで処理し、画像/動画はS3互換ストレージへ保存します。
 
 プロフィールURLは`/@username`、Post詳細は`/@username/status/{postId}`です。ディレクトリ名は`[username]`を使用し、URLパラメータの`@`を取り除いてAPI・DBのusernameとして扱います。`@`なしのプロフィールURLは404となり、転送しません。
 
@@ -79,3 +79,5 @@ GoogleログインはGOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRETを設定し、Googl
 ## 投稿名の統一
 
 投稿の型・APIのquery collection・JSON項目は `Post` / `posts` / `pinnedPost` / `totalPosts` / `userReposts` に統一しています。`005_post_naming.sql` は既存データを保持したままVIEWを更新します。適用済みmigrationは履歴として保持しています。APIとfrontendを同時に更新し、ブラウザを再読み込みしてください。プロフィールおよび投稿の公開URL (`/@username/status/{postId}`) は変わりません。オフラインimportは新しいJSON形式に変換してから実行してください。
+
+ブックマーク機能は廃止しました。`006_remove_bookmarks.sql` は保存済みブックマークと専用indexを削除します。投稿・いいね・リポストは保持します。旧import JSONの廃止フィールドは取り除いてください。

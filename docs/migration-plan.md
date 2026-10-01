@@ -1,11 +1,11 @@
 # Firebase → Go / PostgreSQL migration
 
 ## Inventory (before migration)
-- Next.js Pages Router / React / TypeScript: home, profiles, replies, media, likes, follows, bookmarks, explore, notifications.
+- Next.js Pages Router / React / TypeScript: home, profiles, replies, media, likes, follows, explore, notifications.
 - `src/lib/firebase/{app,collections,utils}.ts`: Auth, Firestore, Storage and Functions SDK initialization, direct writes, counters and uploads.
 - `src/lib/context/auth-context.tsx`: email/password and Google authentication, client-created profiles/stats; administrator inferred from username.
 - `src/lib/hooks/use{Collection,Document,ArrayDocument,InfiniteScroll}` plus page/component imports: snapshots, filters and growing-limit pagination.
-- Collections: users, posts, users/*/stats, users/*/bookmarks, trends, notifications. Timestamp objects, embedded media and arrays of follower/like/repost IDs.
+- Collections: users, posts, users/*/stats, trends, notifications. Timestamp objects, embedded media and arrays of follower/like/repost IDs.
 - `functions/src/normalize-stats.ts`: cleanup after post deletion. `notify-email.ts`: Gmail new-post notification.
 - Firestore rules include a catch-all authenticated read/write grant; private data access and administrator authority must be enforced by the API instead. Storage: authenticated media reads, owner uploads, 50 MiB limit. Fixed administrator UID in rules.
 - Socket.IO API verifies Firebase token; online presence UI currently returns a placeholder. No actual Realtime Database calls found.
@@ -26,7 +26,6 @@
 | Posts/replies/feed | input, home, profile pages | /api/v1/posts; /api/v1/query (feed) | posts, post_media | implemented; DB/API tests |
 | Follow | firebase/utils | /api/v1/users/{id}/follow | follows | implemented; DB/API tests |
 | Likes/reposts | firebase/utils | /api/v1/posts/{id}/{like,repost} | likes, reposts | implemented; DB/API tests |
-| Bookmarks | bookmarks page / user subcollection | /api/v1/posts/{id}/bookmark; /api/v1/bookmarks | bookmarks | implemented; DB/API tests |
 | Profile/theme/pin | user-edit-profile, utils | PATCH /api/v1/users/{id} | users | implemented; DB/API tests |
 | Search/trends | explore, aside-trends, input | /api/v1/query | users, posts, post_tags | implemented; DB/API tests |
 | Notifications | aside-notifications | /api/v1/query; PATCH /api/v1/notifications/{id} | notifications | implemented; DB/API tests |

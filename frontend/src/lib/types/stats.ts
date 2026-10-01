@@ -7,8 +7,8 @@ export type Stats = {
 };
 
 export const statsConverter: DocumentConverter<Stats> = {
-  toDocument(bookmark) {
-    return { ...bookmark };
+  toDocument(stats) {
+    return { ...stats };
   },
   fromDocument(snapshot, options) {
     const data = snapshot.data(options);

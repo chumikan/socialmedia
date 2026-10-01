@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test('register, publish, follow, interact, reply, bookmark, profile, notifications', async ({
+test('register, publish, follow, interact, reply, profile, notifications', async ({
   page,
   browser
 }) => {
@@ -80,12 +80,15 @@ test('register, publish, follow, interact, reply, bookmark, profile, notificatio
   await expect(
     card.getByRole('button', { name: 'Unlike', exact: true })
   ).toBeVisible();
+  const reposted = page.waitForResponse(
+    (response) =>
+      response.url().endsWith(`/api/v1/posts/${post.id}/repost`) &&
+      response.request().method() === 'PUT'
+  );
   await card.getByRole('button', { name: 'Repost', exact: true }).click();
-  await card.getByRole('button', { name: 'Bookmark', exact: true }).click();
-  await page.goto('/bookmarks');
-  await expect(
-    page.getByText(`followed post ${suffix}`, { exact: true })
-  ).toBeVisible();
+  expect((await reposted).ok()).toBeTruthy();
+  await expect(page.getByRole('link', { name: 'Bookmarks', exact: true })).toHaveCount(0);
+  await expect(card.getByRole('button', { name: 'Bookmark', exact: true })).toHaveCount(0);
   await page.goto(`/@${other.username}/status/${post.id}`);
   await page.getByPlaceholder('Post your reply').fill(`reply ${suffix}`);
   await page.getByRole('button', { name: 'Reply', exact: true }).last().click();

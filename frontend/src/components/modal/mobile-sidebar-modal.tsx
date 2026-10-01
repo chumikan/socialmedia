@@ -23,11 +23,6 @@ export type MobileNavLink = Omit<NavLink, 'canBeHidden'>;
 
 const topNavLinks: Readonly<MobileNavLink[]> = [
   {
-    href: '/bookmarks',
-    linkName: 'Bookmarks',
-    iconName: 'BookmarkIcon'
-  },
-  {
     href: '/explore',
     linkName: 'Search',
     iconName: 'MagnifyingGlassIcon',

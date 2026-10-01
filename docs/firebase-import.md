@@ -4,7 +4,7 @@ The importer never calls Firebase, Google Cloud or external image URLs. It reads
 
 ## Input
 
-See `docs/fixtures/firebase-export.json` for a complete small example. Top-level arrays are `users`, `posts`, `notifications`, `authUsers`, `media`; `bookmarks` maps user IDs to bookmark arrays. Each Firestore document must include its document ID as `id`. Use the current document field names (`pinnedPost`, `userReposts`) and preserve UID references. Normalize older export field names to this schema before importing. `createdAt` accepts RFC3339 or `{seconds,nanoseconds}` / `{_seconds,_nanoseconds}`. Embedded `images` reference media manifest IDs.
+See `docs/fixtures/firebase-export.json` for a complete small example. Top-level arrays are `users`, `posts`, `notifications`, `authUsers`, `media`. Each Firestore document must include its document ID as `id`. Use the current document field names (`pinnedPost`, `userReposts`) and preserve UID references. Normalize older export field names to this schema before importing. `createdAt` accepts RFC3339 or `{seconds,nanoseconds}` / `{_seconds,_nanoseconds}`. Embedded `images` reference media manifest IDs.
 
 Firebase Auth JSON exports can supply `authUsers` entries with `localId`, `email`, and `providerUserInfo`. Google `rawId` is imported into oauth_identities. Password hashes and administrator privileges are deliberately not imported: Firebase scrypt hashes are not bcrypt hashes. Stats and trends are rebuilt from posts/relationships. `following` is the canonical source for follows; reconcile inconsistent old follower arrays before import.
 
@@ -32,7 +32,7 @@ go run ./cmd/import-firebase -file ../exports/export.json -media-dir ../exports/
 
 Stable IDs and ON CONFLICT make a repeated import idempotent. Existing rows are retained; this is not a bidirectional sync. Do not mix unrelated exports sharing IDs. DB failure rolls back the database transaction; S3 objects uploaded before that failure can remain and be reused on retry. Missing references fail the transaction rather than being silently dropped. Import does not enqueue historical email notifications.
 
-After import, compare counts, sample user profiles, follows, posts/replies, media, bookmarks and notifications. Run the same export twice in staging to confirm idempotency. Only switch frontend traffic after this validation and a rollback snapshot.
+After import, compare counts, sample user profiles, follows, posts/replies, media and notifications. Run the same export twice in staging to confirm idempotency. Only switch frontend traffic after this validation and a rollback snapshot.
 
 For email/password users, establish identity through your account recovery process, then set a new password through the administrative CLI. Do not use a common default password:
 

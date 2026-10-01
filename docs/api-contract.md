@@ -17,11 +17,9 @@ Errors: `{error:string}` with 400 validation, 401 missing/expired/revoked sessio
 | Method / route | Body | Authorization / semantics |
 |---|---|---|
 | POST /posts | `{text,parentId: string|null,mediaIds:string[]}` | Current user; 280 Unicode characters, 0–4 owned media; text or media required. Reply, tags and outbox in one transaction. Returns `{id}`. |
-| DELETE /posts/{id} | none | Author or admin. Interactions, bookmarks and tag links cascade; replies survive with null parent. |
+| DELETE /posts/{id} | none | Author or admin. Interactions and tag links cascade; replies survive with null parent. |
 | PUT / DELETE /posts/{id}/like | none | Current user; idempotent unique relation; first insertion notifies author. |
 | PUT / DELETE /posts/{id}/repost | none | Current user; idempotent unique relation. |
-| PUT / DELETE /posts/{id}/bookmark | none | Current user; private relation. |
-| DELETE /bookmarks | none | Clears current user's bookmarks. |
 | PUT / DELETE /users/{id}/follow | none | Current user; self-follow and banned targets rejected. |
 | PATCH /users/{id} | Subset of `name,bio,website,location,username,photoURL,coverPhotoURL,theme,accent,pinnedPost` | Owner or admin. No role/verified/BAN fields. Pin must belong to profile owner. Media must be owned by actor. |
 | PUT /users/{id}/ban | `{banned:boolean,reason:string}` | Admin only, cannot target self or another admin. Audit row; session version increments. |
@@ -40,11 +38,11 @@ Errors: `{error:string}` with 400 validation, 401 missing/expired/revoked sessio
 
 Returns `{items: DTO[],nextCursor:string}`. Maximum page size 100, default 50. A nonempty nextCursor is passed verbatim for the next page with the same collection and constraints. Keyset pagination uses ordered values plus a stable ID tie-breaker; insertion at the head does not shift later pages. Ordering by mutable values (e.g. user updatedAt) is not a transaction snapshot. The client deduplicates IDs. `{count:true}` returns `{count:number}`.
 
-Allowed collections: `users`, `posts`, `feed`, `trends`, `notifications`, `users/{id}/bookmarks`, `users/{id}/stats`. Each has a field allowlist in query.go; no SQL, table names or writes are accepted. Filters: `==`, `!=`, comparisons, `array-contains`; order: asc/desc; start/end bounds for username prefix search. `where text search` uses PostgreSQL simple full-text search with a GIN index. Japanese morphological tokenization is not included.
+Allowed collections: `users`, `posts`, `feed`, `trends`, `notifications`, `users/{id}/stats`. Each has a field allowlist in query.go; no SQL, table names or writes are accepted. Filters: `==`, `!=`, comparisons, `array-contains`; order: asc/desc; start/end bounds for username prefix search. `where text search` uses PostgreSQL simple full-text search with a GIN index. Japanese morphological tokenization is not included.
 
 Feed = own/followed users' posts plus posts reposted by followed users, newest original post first; one entry per post. Client can exclude replies. Banned authors' posts are always excluded. Follow/like/repost arrays are compatibility projections over normalized relationship tables, not authoritative client-writable arrays.
 
-Notifications are restricted to the recipient. Other users' bookmark paths are rejected. Public user views never include email, password hash or session data.
+Notifications are restricted to the recipient. Public user views never include email, password hash or session data.
 
 `GET /presence` records current user's activity and returns up to 100 recently active IDs. Changes are refreshed with polling; no Socket.IO or Firebase listener connection remains.
 

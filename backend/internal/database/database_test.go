@@ -57,6 +57,7 @@ func TestUpgradeMigrations(t *testing.T) {
  INSERT INTO users(id,email,username,name) VALUES('a','a@test.invalid','alice','Alice'),('b','b@test.invalid','bob','Bob');
  INSERT INTO posts(id,author_id,text) VALUES('p','a','retained');
  UPDATE users SET pinned_post_id='p' WHERE id='a';
+ INSERT INTO bookmarks(user_id,post_id) VALUES('a','p');
  INSERT INTO reposts(user_id,post_id) VALUES('b','p');
  INSERT INTO conversations(id,user_id,target_user_id) VALUES('c','a','b');
  INSERT INTO messages(id,conversation_id,user_id,text) VALUES('m','c','a','removed');
@@ -69,7 +70,7 @@ func TestUpgradeMigrations(t *testing.T) {
 			t.Fatal(err)
 		}
 	}
-	for _, name := range []string{"messages", "conversations", "message_documents", "conversation_documents", "messages_pkey", "conversations_pkey", "messages_conversation", "conversations_pair", "conversations_user", "conversations_target"} {
+	for _, name := range []string{"bookmarks", "bookmarks_pkey", "bookmarks_user_time", "messages", "conversations", "message_documents", "conversation_documents", "messages_pkey", "conversations_pkey", "messages_conversation", "conversations_pair", "conversations_user", "conversations_target"} {
 		var absent bool
 		if err = db.QueryRow(ctx, "SELECT to_regclass($1) IS NULL", schema+"."+name).Scan(&absent); err != nil || !absent {
 			t.Fatalf("relation %s remains: %v", name, err)

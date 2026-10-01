@@ -15,9 +15,6 @@ func TestQueryAuthorizationAndInjection(t *testing.T) {
 			t.Fatalf("missing recipient predicate: %s", sql)
 		}
 	}
-	if _, _, e := compileQuery(QueryInput{Collection: "users/bob/bookmarks"}, "alice"); e == nil {
-		t.Fatal("private bookmarks accepted")
-	}
 	for _, q := range []QueryInput{{Collection: "users; DROP TABLE users"}, {Collection: "users", Constraints: []Constraint{{Kind: "where", Field: "id') OR TRUE --", Op: "==", Value: "x"}}}, {Collection: "users", Cursor: "invalid"}} {
 		if _, _, e := compileQuery(q, "alice"); e == nil {
 			t.Fatalf("accepted invalid query: %+v", q)

@@ -71,7 +71,7 @@ func TestImportIntegration(t *testing.T) {
 			t.Fatal(e)
 		}
 	}
-	for table, want := range map[string]int{"users": 2, "posts": 1, "follows": 1, "likes": 1, "reposts": 1, "bookmarks": 1, "post_tags": 1} {
+	for table, want := range map[string]int{"users": 2, "posts": 1, "follows": 1, "likes": 1, "reposts": 1, "post_tags": 1} {
 		var n int
 		if e = p.QueryRow(ctx, "SELECT count(*) FROM "+table).Scan(&n); e != nil || n != want {
 			t.Fatalf("%s: %d %v", table, n, e)

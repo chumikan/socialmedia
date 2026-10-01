@@ -15,13 +15,13 @@ export function UserHomeCover({ coverData }: UserHomeCoverProps): JSX.Element {
   const { open, openModal, closeModal } = useModal();
 
   return (
-    <div className='mt-0.5 h-36 xs:h-48 sm:h-52'>
+    <div className='relative mt-0.5 aspect-[15/4] w-full'>
       <Modal open={open} closeModal={closeModal}>
         <ImageModal imageData={coverData as ImageData} previewCount={1} />
       </Modal>
       {coverData ? (
         <Button
-          className='accent-tab relative h-full w-full rounded-none p-0 transition hover:brightness-75'
+          className='accent-tab absolute inset-0 h-full w-full rounded-none p-0 transition hover:brightness-75'
           onClick={openModal}
         >
           <NextImage
@@ -34,7 +34,7 @@ export function UserHomeCover({ coverData }: UserHomeCoverProps): JSX.Element {
           />
         </Button>
       ) : (
-        <div className='h-full bg-light-line-reply dark:bg-dark-line-reply' />
+        <div className='absolute inset-0 bg-light-line-reply dark:bg-dark-line-reply' />
       )}
     </div>
   );

@@ -84,7 +84,7 @@ func (a *App) deletePost(w http.ResponseWriter, r *http.Request) error {
 }
 func (a *App) interaction(kind string, add bool) func(http.ResponseWriter, *http.Request) error {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		table := map[string]string{"like": "likes", "repost": "reposts", "bookmark": "bookmarks"}[kind]
+		table := map[string]string{"like": "likes", "repost": "reposts"}[kind]
 		err := a.transaction(r, func(tx pgx.Tx, uid string) error {
 			pid := r.PathValue("id")
 			var author string
@@ -97,7 +97,7 @@ func (a *App) interaction(kind string, add bool) func(http.ResponseWriter, *http
 				if err != nil {
 					return err
 				}
-				if tag.RowsAffected() > 0 && kind != "bookmark" {
+				if tag.RowsAffected() > 0 {
 					nt := kind
 					if kind == "like" {
 						nt = "liked"
@@ -114,14 +114,4 @@ func (a *App) interaction(kind string, add bool) func(http.ResponseWriter, *http
 		}
 		return respond(w, map[string]bool{"ok": true})
 	}
-}
-func (a *App) clearBookmarks(w http.ResponseWriter, r *http.Request) error {
-	err := a.transaction(r, func(tx pgx.Tx, uid string) error {
-		_, err := tx.Exec(r.Context(), "DELETE FROM bookmarks WHERE user_id=$1", uid)
-		return err
-	})
-	if err != nil {
-		return err
-	}
-	return respond(w, map[string]bool{"ok": true})
 }

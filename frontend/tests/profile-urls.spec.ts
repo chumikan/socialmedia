@@ -269,7 +269,6 @@ test('unprefixed profile URLs are rejected and fixed routes still work', async (
     '/home',
     '/explore',
     '/notifications',
-    '/bookmarks',
     '/search?q=hello'
   ]) {
     await page.goto(path);

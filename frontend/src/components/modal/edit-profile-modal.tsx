@@ -88,7 +88,7 @@ export function EditProfileModal({
           loading && 'pointer-events-none opacity-50'
         )}
       >
-        <div className='group relative mt-[52px] h-36 xs:h-44 sm:h-48'>
+        <div className='group relative mt-[52px] aspect-[15/4] w-full'>
           <input
             className='hidden'
             type='file'
@@ -99,7 +99,7 @@ export function EditProfileModal({
           {coverPhotoURL ? (
             <NextImage
               useSkeleton
-              className='relative h-full'
+              className='absolute inset-0'
               imgClassName='object-cover transition group-hover:brightness-75 duration-200
                             group-focus-within:brightness-75'
               src={coverPhotoURL}
@@ -107,7 +107,7 @@ export function EditProfileModal({
               layout='fill'
             />
           ) : (
-            <div className='h-full bg-light-line-reply dark:bg-dark-line-reply' />
+            <div className='absolute inset-0 bg-light-line-reply dark:bg-dark-line-reply' />
           )}
           <div className='absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 gap-4'>
             <Button
@@ -172,6 +172,11 @@ export function EditProfileModal({
               </Button>
             </div>
           </div>
+          <p className='text-sm text-light-secondary dark:text-dark-secondary'>
+            ヘッダー推奨サイズ：1920 × 512px（3.75:1）
+            <br />
+            アイコン推奨サイズ：512 × 512px（1:1）
+          </p>
           {children}
           <Button
             className='accent-tab -mx-4 mb-4 flex  items-center justify-between rounded-none

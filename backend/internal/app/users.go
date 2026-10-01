@@ -17,7 +17,7 @@ func validUsername(s string) bool {
 		return false
 	}
 	switch strings.ToLower(s) {
-	case "home", "notifications", "bookmarks", "explore", "api", "admin", "login", "assets":
+	case "home", "notifications", "explore", "api", "admin", "login", "assets":
 		return false
 	}
 	return true

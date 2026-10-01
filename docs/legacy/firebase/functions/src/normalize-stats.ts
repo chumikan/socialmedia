@@ -1,5 +1,5 @@
 import { functions, firestore, regionalFunctions } from './lib/utils';
-import { postConverter, bookmarkConverter } from './types';
+import { postConverter } from './types';
 import type { Post } from './types';
 
 export const normalizeStats = regionalFunctions.firestore
@@ -27,20 +27,6 @@ export const normalizeStats = regionalFunctions.firestore
         posts: firestore.FieldValue.arrayRemove(postId),
         likes: firestore.FieldValue.arrayRemove(postId)
       });
-    });
-
-    const bookmarksQuery = firestore()
-      .collectionGroup('bookmarks')
-      .where('id', '==', postId)
-      .withConverter(bookmarkConverter);
-
-    const docsSnap = await bookmarksQuery.get();
-
-    functions.logger.info(`Deleting ${docsSnap.size} bookmarks`);
-
-    docsSnap.docs.forEach(({ id, ref }) => {
-      functions.logger.info(`Deleting bookmark ${id}`);
-      batch.delete(ref);
     });
 
     await batch.commit();

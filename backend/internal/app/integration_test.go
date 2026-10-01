@@ -158,7 +158,6 @@ func TestIntegration(t *testing.T) {
 		t.Fatal("duplicate likes", likes, err)
 	}
 	must("PUT", "/posts/"+post+"/repost", nil, ac)
-	must("PUT", "/posts/"+post+"/bookmark", nil, ac)
 	must("PATCH", "/users/"+bob, map[string]any{"pinnedPost": post}, bc)
 	profile := must("GET", "/auth/me", nil, bc)
 	if profile["pinnedPost"] != post || profile["totalPosts"] != float64(1) {
@@ -176,9 +175,15 @@ func TestIntegration(t *testing.T) {
 
 	reply := must("POST", "/posts", PostInput{Text: "reply", ParentID: &post}, ac)["id"].(string)
 	_ = reply
-	if status, _, _ := call("POST", "/query", q("users/"+alice+"/bookmarks"), bc); status != 403 {
-		t.Fatal("bookmark leak")
+	for _, endpoint := range []struct{ method, path string }{{"PUT", "/posts/" + post + "/bookmark"}, {"DELETE", "/posts/" + post + "/bookmark"}, {"DELETE", "/bookmarks"}} {
+		if status, _, _ := call(endpoint.method, endpoint.path, nil, ac); status != 404 {
+			t.Fatalf("removed endpoint %s: %d", endpoint.path, status)
+		}
 	}
+	if status, _, _ := call("POST", "/query", q("users/"+alice+"/bookmarks"), ac); status != 400 {
+		t.Fatalf("removed collection: %d", status)
+	}
+
 	for _, route := range []string{"/messages", "/conversations"} {
 		if status, _, _ := call("POST", route, map[string]string{}, ac); status != http.StatusNotFound {
 			t.Fatalf("removed route %s returned %d", route, status)
@@ -213,7 +218,7 @@ func TestIntegration(t *testing.T) {
 		}
 	}
 	must("DELETE", "/posts/"+post, nil, bc)
-	for _, table := range []string{"likes", "reposts", "bookmarks", "post_tags"} {
+	for _, table := range []string{"likes", "reposts", "post_tags"} {
 		var n int
 		db.QueryRow(ctx, "SELECT count(*) FROM "+table+" WHERE post_id=$1", post).Scan(&n)
 		if n != 0 {
