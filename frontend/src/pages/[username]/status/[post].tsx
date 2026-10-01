@@ -9,7 +9,6 @@ import { isPlural } from '@lib/utils';
 import { HomeLayout, ProtectedLayout } from '@components/layout/common-layout';
 import { MainLayout } from '@components/layout/main-layout';
 import { MainContainer } from '@components/home/main-container';
-import { MainHeader } from '@components/home/main-header';
 import { Post } from '@components/post/post';
 import { ViewPost } from '@components/view/view-post';
 import { SEO } from '@components/common/seo';
@@ -20,8 +19,7 @@ import type { JSX, ReactElement, ReactNode } from 'react';
 
 export default function PostId(): JSX.Element {
   const {
-    query: { post },
-    back
+    query: { post }
   } = useRouter();
 
   const { data: postData, loading: postLoading } = useDocument(
@@ -55,11 +53,6 @@ export default function PostId(): JSX.Element {
 
   return (
     <MainContainer className='!pb-[1280px]'>
-      <MainHeader
-        useActionButton
-        title={parentId ? 'Thread' : 'Post'}
-        action={back}
-      />
       <section>
         {postLoading ? (
           <Loading className='mt-5' />

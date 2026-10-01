@@ -18,13 +18,9 @@ import {
   ExploreLayout,
   ProtectedLayout
 } from '@components/layout/common-layout';
-import { Button } from '@components/ui/button';
-import { ToolTip } from '@components/ui/tooltip';
-import { HeroIcon } from '@components/ui/hero-icon';
 import { MainLayout } from '@components/layout/main-layout';
 import { UserCard } from '@components/user/user-card';
 import { UserSearchBar } from '@components/user/user-search';
-import { MainHeader } from '@components/home/main-header';
 import type { User } from '@lib/types/user';
 
 const UsersList: React.FC<{ users: User[] }> = ({ users }) => {
@@ -80,20 +76,6 @@ export default function SearchPage(): JSX.Element {
 
   return (
     <MainContainer>
-      <MainHeader
-        useMobileSidebar
-        title='Search'
-        className='flex items-center justify-between'
-      >
-        <Button
-          className='dark-bg-tab group relative ml-auto cursor-not-allowed p-2 hover:bg-light-primary/10
-                           active:bg-light-primary/20 dark:hover:bg-dark-primary/10 dark:active:bg-dark-primary/20'
-        >
-          <HeroIcon className='h-5 w-5' iconName='Cog8ToothIcon' />
-          <ToolTip tip='Settings' />
-        </Button>
-      </MainHeader>
-
       <div className='container mx-auto p-4'>
         <UserSearchBar
           value={input}
