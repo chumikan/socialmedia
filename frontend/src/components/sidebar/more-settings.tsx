@@ -51,14 +51,14 @@ export function MoreSettings(): JSX.Element {
               >
                 <HeroIcon
                   className='h-7 w-7'
-                  iconName='EllipsisHorizontalCircleIcon'
+                  iconName='Bars3Icon'
                 />
               </div>
             </Menu.Button>
             <AnimatePresence>
               {open && (
                 <Menu.Items
-                  className='menu-container absolute -top-44 w-60 font-medium'
+                  className='menu-container absolute bottom-full mb-2 w-60 font-medium'
                   as={motion.div}
                   {...variants}
                   static

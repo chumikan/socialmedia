@@ -13,7 +13,6 @@ import { CustomIcon } from '@components/ui/custom-icon';
 import { Button } from '@components/ui/button';
 import { SidebarLink } from './sidebar-link';
 import { MoreSettings } from './more-settings';
-import { SidebarProfile } from './sidebar-profile';
 import type { JSX, ReactNode } from 'react';
 
 import type * as SolidIcons from '@heroicons/react/24/solid';
@@ -129,7 +128,6 @@ export function Sidebar(): JSX.Element {
               icon={<CiUser size={34} />}
               iconName='UserIcon'
             />
-            {!isMobile && <MoreSettings />}
           </nav>
           <Button
             aria-label='Post'
@@ -142,7 +140,11 @@ export function Sidebar(): JSX.Element {
             <CustomIcon className='h-6 w-6' iconName='FeatherIcon' />
           </Button>
         </section>
-        {!isMobile && <SidebarProfile />}
+        {!isMobile && (
+          <div className='flex justify-center'>
+            <MoreSettings />
+          </div>
+        )}
       </div>
     </header>
   );
